@@ -1,0 +1,6 @@
+@SynclyServer_HostAddress = http://localhost:5160
+
+GET {{SynclyServer_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###
