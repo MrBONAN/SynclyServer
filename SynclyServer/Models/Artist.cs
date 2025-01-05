@@ -1,3 +1,4 @@
+using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
 
 namespace SynclyServer.Models;
@@ -6,6 +7,7 @@ namespace SynclyServer.Models;
 public class Artist
 {
     public int Id { get; set; }
-    public string Name { get; set; } = string.Empty;
+    [MaxLength(50)] public string Name { get; set; } = string.Empty;
+    public List<Track> Tracks { get; set; } = new();
     public int LinksId { get; set; }
 }

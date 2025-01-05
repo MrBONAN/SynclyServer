@@ -5,13 +5,15 @@ namespace SynclyServer.Mappers;
 
 public static class LinksMappers
 {
-    public static LinksDto ToLinksDto(this Links links)
+    public static LinksDto ToLinksDto(this Links linksModel)
     {
         return new LinksDto
         {
-            Id = links.Id,
-            SpotifyImageLink = links.SpotifyImageLink,
-            SpotifyLink = links.SpotifyLink
+            Id = linksModel.Id,
+            ExternalImageLink = linksModel.ExternalImageLink,
+            ExternalLink = linksModel.ExternalLink,
+            ExternalId = linksModel.ExternalId,
+            PlatformName = linksModel.PlatformName
         };
     }
 }
