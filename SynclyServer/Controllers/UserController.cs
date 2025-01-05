@@ -1,5 +1,4 @@
 using Microsoft.AspNetCore.Mvc;
-using Microsoft.Identity.Client;
 using SynclyServer.Interfaces;
 using SynclyServer.Mappers;
 

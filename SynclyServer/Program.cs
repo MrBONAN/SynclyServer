@@ -16,6 +16,7 @@ builder.Services.AddControllers().AddNewtonsoftJson(options =>
 );
 
 builder.Services.AddScoped<IUserRepository, UserRepository>();
+builder.Services.AddScoped<ILinksRepository, LinksRepository>();
 
 
 // TODO: Возможно, стоит сделать разделение базы данных, если мы будем реализовывать автоматическое подтягивание кода
