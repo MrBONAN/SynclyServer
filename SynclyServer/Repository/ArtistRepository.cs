@@ -11,11 +11,15 @@ public class ArtistRepository(ServerDbContext context) : IArtistRepository
 
     public async Task<List<Artist>> GetAllAsync()
     {
-        return await Context.Artists.ToListAsync();
+        return await Context.Artists
+            .Include(a => a.Links)
+            .ToListAsync();
     }
 
     public async Task<Artist?> GetByIdAsync(int id)
     {
-        return await Context.Artists.FindAsync(id);
+        return await Context.Artists
+            .Include(a => a.Links)
+            .FirstOrDefaultAsync(a => a.Id == id);
     }
 }

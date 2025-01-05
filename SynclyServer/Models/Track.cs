@@ -12,4 +12,5 @@ public class Track
     public List<TrackArtist> TrackArtists { get; set; } = new();
     [MaxLength(20)] public string Genre { get; set; } = string.Empty;
     public int LinksId { get; set; }
+    public Links Links { get; set; }
 }

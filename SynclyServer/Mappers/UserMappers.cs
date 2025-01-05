@@ -13,6 +13,7 @@ public static class UserMappers
             Name = userModel.Name,
             // TODO заменить на возврат из таблицы Links
             LinksId = userModel.LinksId,
+            Links = userModel.Links.ToLinksDto()
         };
     }
 }

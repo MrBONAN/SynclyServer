@@ -14,6 +14,8 @@ public class TrackRepository(ServerDbContext context) : ITrackRepository
         return await Context.Tracks
             .Include(t => t.TrackArtists)
             .ThenInclude(ta => ta.Artist)
+            .ThenInclude(a => a.Links)
+            .Include(t => t.Links)
             .ToListAsync();
     }
 
@@ -22,6 +24,8 @@ public class TrackRepository(ServerDbContext context) : ITrackRepository
         return await Context.Tracks
             .Include(t => t.TrackArtists)
             .ThenInclude(ta => ta.Artist)
+            .ThenInclude(a => a.Links)
+            .Include(t => t.Links)
             .FirstOrDefaultAsync(t => t.Id == id);
     }
 }

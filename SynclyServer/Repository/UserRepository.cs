@@ -11,11 +11,15 @@ public class UserRepository(ServerDbContext context) : IUserRepository
 
     public async Task<List<User>> GetAllAsync()
     {
-        return await Context.Users.ToListAsync();
+        return await Context.Users
+            .Include(u => u.Links)
+            .ToListAsync();
     }
 
     public async Task<User?> GetByIdAsync(int id)
     {
-        return await Context.Users.FindAsync(id);
+        return await Context.Users
+            .Include(u => u.Links)
+            .FirstOrDefaultAsync(u => u.Id == id);
     }
 }

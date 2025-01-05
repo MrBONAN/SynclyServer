@@ -20,6 +20,7 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureTrackArtistTable(modelBuilder);
+        ConfigureLinks(modelBuilder);
     }
 
     private void ConfigureTrackArtistTable(ModelBuilder modelBuilder)
@@ -36,5 +37,10 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
             .HasOne(ta => ta.Artist)
             .WithMany()
             .HasForeignKey(ta => ta.ArtistId);
+    }
+
+    private void ConfigureLinks(ModelBuilder modelBuilder)
+    {
+        //modelBuilder.Entity<>()
     }
 }

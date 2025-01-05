@@ -1,4 +1,5 @@
 using SynclyServer.Dtos.Artist;
+using SynclyServer.Dtos.Links;
 
 namespace SynclyServer.Dtos.Track;
 
@@ -9,4 +10,5 @@ public class TrackDto
     public List<ArtistDto> Artists { get; set; } = new();
     public string Genre { get; set; } = string.Empty;
     public int LinksId { get; set; }
+    public LinksDto Links { get; set; }
 }
