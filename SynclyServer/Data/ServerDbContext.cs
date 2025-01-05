@@ -33,8 +33,8 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
             .HasForeignKey(ta => ta.TrackId);
 
         modelBuilder.Entity<TrackArtist>()
-            .HasOne(ut => ut.Track)
+            .HasOne(ta => ta.Artist)
             .WithMany()
-            .HasForeignKey(ut => ut.TrackId);
+            .HasForeignKey(ta => ta.ArtistId);
     }
 }

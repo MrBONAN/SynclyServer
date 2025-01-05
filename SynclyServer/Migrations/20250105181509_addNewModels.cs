@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SynclyServer.Migrations
 {
     /// <inheritdoc />
-    public partial class init : Migration
+    public partial class addNewModels : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -17,7 +17,7 @@ namespace SynclyServer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LinksId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
@@ -61,28 +61,14 @@ namespace SynclyServer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    SpotifyImageLink = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    SpotifyLink = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    ExternalImageLink = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ExternalLink = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    ExternalId = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    PlatformName = table.Column<string>(type: "nvarchar(10)", maxLength: 10, nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ServiceLinks", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Tracks",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ArtistId = table.Column<int>(type: "int", nullable: false),
-                    Genre = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LinksId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Tracks", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -107,23 +93,78 @@ namespace SynclyServer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     LinksId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                 });
+
+            migrationBuilder.CreateTable(
+                name: "Tracks",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Genre = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
+                    LinksId = table.Column<int>(type: "int", nullable: false),
+                    ArtistId = table.Column<int>(type: "int", nullable: true)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Tracks", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Tracks_Artists_ArtistId",
+                        column: x => x.ArtistId,
+                        principalTable: "Artists",
+                        principalColumn: "Id");
+                });
+
+            migrationBuilder.CreateTable(
+                name: "JoinTrackArtist",
+                columns: table => new
+                {
+                    TrackId = table.Column<int>(type: "int", nullable: false),
+                    ArtistId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_JoinTrackArtist", x => new { x.TrackId, x.ArtistId });
+                    table.ForeignKey(
+                        name: "FK_JoinTrackArtist_Artists_ArtistId",
+                        column: x => x.ArtistId,
+                        principalTable: "Artists",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                    table.ForeignKey(
+                        name: "FK_JoinTrackArtist_Tracks_TrackId",
+                        column: x => x.TrackId,
+                        principalTable: "Tracks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinTrackArtist_ArtistId",
+                table: "JoinTrackArtist",
+                column: "ArtistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Tracks_ArtistId",
+                table: "Tracks",
+                column: "ArtistId");
         }
 
         /// <inheritdoc />
         protected override void Down(MigrationBuilder migrationBuilder)
         {
             migrationBuilder.DropTable(
-                name: "Artists");
+                name: "CurrentTracks");
 
             migrationBuilder.DropTable(
-                name: "CurrentTracks");
+                name: "JoinTrackArtist");
 
             migrationBuilder.DropTable(
                 name: "RecentlyTracks");
@@ -132,13 +173,16 @@ namespace SynclyServer.Migrations
                 name: "ServiceLinks");
 
             migrationBuilder.DropTable(
-                name: "Tracks");
-
-            migrationBuilder.DropTable(
                 name: "UserLocations");
 
             migrationBuilder.DropTable(
                 name: "Users");
+
+            migrationBuilder.DropTable(
+                name: "Tracks");
+
+            migrationBuilder.DropTable(
+                name: "Artists");
         }
     }
 }

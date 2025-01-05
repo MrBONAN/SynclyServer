@@ -9,7 +9,7 @@ namespace SynclyServer.Controllers;
 [ApiController]
 public class TrackController(ITrackRepository trackRepository) : ControllerBase
 {
-    private readonly ITrackRepository TrackRepository;
+    private readonly ITrackRepository TrackRepository = trackRepository;
 
     [HttpGet]
     public async Task<IActionResult> GetAll()

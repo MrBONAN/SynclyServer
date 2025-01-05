@@ -11,7 +11,7 @@ public static class ArtistMappers
         {
             Id = artisModel.Id,
             Name = artisModel.Name,
-            Tracks = artisModel.Tracks.Select(t => t.ToTrackDto()).ToList(),
+            //Tracks = artisModel.Tracks.Select(t => t.ToTrackDto()).ToList(),
             LinksId = artisModel.LinksId
         };
     }

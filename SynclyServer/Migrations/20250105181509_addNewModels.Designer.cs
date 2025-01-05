@@ -12,8 +12,8 @@ using SynclyServer.Data;
 namespace SynclyServer.Migrations
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20250105134323_init")]
-    partial class init
+    [Migration("20250105181509_addNewModels")]
+    partial class addNewModels
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -38,7 +38,8 @@ namespace SynclyServer.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -67,6 +68,21 @@ namespace SynclyServer.Migrations
                     b.ToTable("CurrentTracks");
                 });
 
+            modelBuilder.Entity("SynclyServer.Models.JoinTables.TrackArtist", b =>
+                {
+                    b.Property<int>("TrackId")
+                        .HasColumnType("int");
+
+                    b.Property<int>("ArtistId")
+                        .HasColumnType("int");
+
+                    b.HasKey("TrackId", "ArtistId");
+
+                    b.HasIndex("ArtistId");
+
+                    b.ToTable("JoinTrackArtist");
+                });
+
             modelBuilder.Entity("SynclyServer.Models.Links", b =>
                 {
                     b.Property<int>("Id")
@@ -75,13 +91,25 @@ namespace SynclyServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<string>("SpotifyImageLink")
+                    b.Property<string>("ExternalId")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
-                    b.Property<string>("SpotifyLink")
+                    b.Property<string>("ExternalImageLink")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("ExternalLink")
+                        .IsRequired()
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
+
+                    b.Property<string>("PlatformName")
+                        .IsRequired()
+                        .HasMaxLength(10)
+                        .HasColumnType("nvarchar(10)");
 
                     b.HasKey("Id");
 
@@ -118,21 +146,25 @@ namespace SynclyServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int>("ArtistId")
+                    b.Property<int?>("ArtistId")
                         .HasColumnType("int");
 
                     b.Property<string>("Genre")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<int>("LinksId")
                         .HasColumnType("int");
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("ArtistId");
 
                     b.ToTable("Tracks");
                 });
@@ -150,7 +182,8 @@ namespace SynclyServer.Migrations
 
                     b.Property<string>("Name")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.HasKey("Id");
 
@@ -180,6 +213,42 @@ namespace SynclyServer.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("UserLocations");
+                });
+
+            modelBuilder.Entity("SynclyServer.Models.JoinTables.TrackArtist", b =>
+                {
+                    b.HasOne("SynclyServer.Models.Artist", "Artist")
+                        .WithMany()
+                        .HasForeignKey("ArtistId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.HasOne("SynclyServer.Models.Track", "Track")
+                        .WithMany("TrackArtists")
+                        .HasForeignKey("TrackId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Artist");
+
+                    b.Navigation("Track");
+                });
+
+            modelBuilder.Entity("SynclyServer.Models.Track", b =>
+                {
+                    b.HasOne("SynclyServer.Models.Artist", null)
+                        .WithMany("Tracks")
+                        .HasForeignKey("ArtistId");
+                });
+
+            modelBuilder.Entity("SynclyServer.Models.Artist", b =>
+                {
+                    b.Navigation("Tracks");
+                });
+
+            modelBuilder.Entity("SynclyServer.Models.Track", b =>
+                {
+                    b.Navigation("TrackArtists");
                 });
 #pragma warning restore 612, 618
         }
