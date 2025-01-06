@@ -18,4 +18,11 @@ public class LocationRepository(ServerDbContext context) : ILocationRepository
     {
         return await Context.Locations.FindAsync(id);
     }
+
+    public async Task<Location> CreateAsync(Location locationModel)
+    {
+        await Context.Locations.AddAsync(locationModel);
+        await Context.SaveChangesAsync();
+        return locationModel;
+    }
 }

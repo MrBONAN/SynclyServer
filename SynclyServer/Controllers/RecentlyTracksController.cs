@@ -13,7 +13,7 @@ public class RecentlyTracksController(IUserRepository userRepository) : Controll
     [HttpGet("recently-played/{userId:int}")]
     public async Task<IActionResult> GetRecentlyTracks([FromRoute] int userId)
     {
-        var recentlyTracks = await UserRepository.GetRecentlyTracks(userId);
+        var recentlyTracks = await UserRepository.GetRecentlyTracksAsync(userId);
         if (recentlyTracks is null)
             return NotFound();
         return Ok(recentlyTracks.Select(t => t.ToTrackDto()));

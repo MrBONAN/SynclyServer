@@ -1,13 +1,15 @@
 using Microsoft.EntityFrameworkCore;
 using SynclyServer.Data;
 using SynclyServer.Interfaces;
+using SynclyServer.Mappers;
 using SynclyServer.Models;
 
 namespace SynclyServer.Repository;
 
-public class UserRepository(ServerDbContext context) : IUserRepository
+public class UserRepository(ServerDbContext context, ILocationRepository locationRepository) : IUserRepository
 {
     private readonly ServerDbContext Context = context;
+    private readonly ILocationRepository LocationRepository = locationRepository;
     private const int MaxTopTracks = 10;
     private const int MaxTopArtists = 10;
     private const int MaxRecentlyTracks = 10;
@@ -46,7 +48,7 @@ public class UserRepository(ServerDbContext context) : IUserRepository
         return user?.TopArtists.Select(ua => ua.Artist).ToList()!;
     }
 
-    public async Task<List<Track>?> GetRecentlyTracks(int userId)
+    public async Task<List<Track>?> GetRecentlyTracksAsync(int userId)
     {
         var user = await Context.Users
             .Include(u => u.RecentlyTracks.OrderBy(ut => ut.Position).Take(MaxRecentlyTracks))
@@ -54,5 +56,12 @@ public class UserRepository(ServerDbContext context) : IUserRepository
             .ThenInclude(t => t!.Links)
             .FirstOrDefaultAsync(u => u.Id == userId);
         return user?.RecentlyTracks.Select(ut => ut.Track).ToList()!;
+    }
+
+    public async Task<User> CreateAsync(User userModel)
+    {
+        await Context.Users.AddAsync(userModel);
+        await Context.SaveChangesAsync();
+        return userModel;
     }
 }

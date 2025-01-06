@@ -1,4 +1,6 @@
 using System.ComponentModel.DataAnnotations.Schema;
+using Infrastructure.API.SpotifyAPI.Models;
+using SynclyServer.Dtos.Authorization.Spotify;
 
 namespace SynclyServer.Models.Authorization;
 
@@ -6,8 +8,8 @@ namespace SynclyServer.Models.Authorization;
 public class Registration
 {
     public int Id { get; set; }
-    public int UserId { get; set; }
-    public User User { get; set; } = null!;
+    public int? UserId { get; set; }
+    public User? User { get; set; } = null!;
     public string ExternalId { get; set; } = null!;
     public string PlatformName { get; set; } = null!;
 

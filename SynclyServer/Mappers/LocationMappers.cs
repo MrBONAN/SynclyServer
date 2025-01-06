@@ -10,7 +10,7 @@ public static class LocationMappers
         return new LocationDto()
         {
             Id = locationModel.Id,
-            UserId = locationModel.UserId,
+            //UserId = locationModel.UserId!.Value,
             Latitude = locationModel.Latitude!.Value,
             Longitude = locationModel.Longitude!.Value,
             LastUpdate = locationModel.LastUpdate
