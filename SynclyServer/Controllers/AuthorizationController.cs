@@ -1,7 +1,6 @@
-using Infrastructure.API.SpotifyAPI;
-using Infrastructure.API.SpotifyAPI.Models;
 using Microsoft.AspNetCore.Mvc;
-using SynclyServer.Dtos.Authorization.Spotify;
+using SpotifyApi.Models;
+using SpotifyApi.Models.Authorization;
 using SynclyServer.Interfaces;
 using SynclyServer.Mappers;
 using SynclyServer.Models;
@@ -26,7 +25,7 @@ public class AuthorizationController(
     [Route("spotify")]
     public async Task<IActionResult> Authorize([FromBody] SpotifyAccessTokenDto accessTokenDto)
     {
-        var userProfile = await SpotifyApi.GetUserProfileAsync(accessTokenDto.AccessToken);
+        var userProfile = await SpotifyApi.SpotifyApi.GetUserProfileAsync(accessTokenDto.AccessToken);
         if (userProfile.Data is null)
             return BadRequest($"Couldn't get user data: {userProfile.Response.StatusCode}");
         var userRegistration = await RegistrationRepository.FindAsync(userProfile.Data.Id!, "spotify");

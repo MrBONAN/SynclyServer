@@ -1,6 +1,6 @@
 using RestSharp;
 
-namespace Infrastructure.API.SpotifyAPI;
+namespace SpotifyApi;
 
 public record SpotifyApiResult<T>(ApiResult Result, T? Data, RestResponse<T> Response);
 public record SpotifyApiResult<T, T2>(ApiResult Result, T? Data, RestResponse<T2> Response);

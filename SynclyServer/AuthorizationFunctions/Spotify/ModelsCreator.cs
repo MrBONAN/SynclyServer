@@ -1,4 +1,4 @@
-using Infrastructure.API.SpotifyAPI.Models;
+using SpotifyApi.Models;
 using SynclyServer.Models;
 using SynclyServer.Models.Authorization;
 

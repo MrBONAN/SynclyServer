@@ -1,9 +1,8 @@
-﻿using dotenv.net;
-using Infrastructure.API.SpotifyAPI.Models;
-using RestSharp;
-using Infrastructure.API.SpotifyAPI.SearchQuestionCreator;
+﻿using RestSharp;
+using SpotifyApi.Models;
+using SpotifyApi.SearchQuestionCreator;
 
-namespace Infrastructure.API.SpotifyAPI;
+namespace SpotifyApi;
 
 public static partial class SpotifyApi
 {

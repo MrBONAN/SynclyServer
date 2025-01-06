@@ -1,7 +1,7 @@
-using Infrastructure.API.SpotifyAPI.Models;
 using RestSharp;
+using SpotifyApi.Models;
 
-namespace Infrastructure.API.SpotifyAPI;
+namespace SpotifyApi;
 
 public static partial class SpotifyApi
 {
@@ -26,7 +26,7 @@ public static partial class SpotifyApi
         var request = new RestRequest($"{type}?ids={string.Join(',', ids)}");
         request.AddHeader("Authorization", $"Bearer {accessToken}");
 
-        var response = await SpotifyClient.ExecuteGetAsync<TracksAndArtistsList<T>>(request);
+        var response = await SpotifyApi.SpotifyClient.ExecuteGetAsync<TracksAndArtistsList<T>>(request);
 
         if (response.IsSuccessful && response.Data != null)
             return new SpotifyApiResult<List<T>, TracksAndArtistsList<T>>(ApiResult.Success,

@@ -1,6 +1,4 @@
 using System.ComponentModel.DataAnnotations.Schema;
-using Infrastructure.API.SpotifyAPI.Models;
-using SynclyServer.Dtos.Authorization.Spotify;
 
 namespace SynclyServer.Models.Authorization;
 

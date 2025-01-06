@@ -1,6 +1,6 @@
 using System.Text.Json.Serialization;
 
-namespace Infrastructure.API.SpotifyAPI.Models;
+namespace SpotifyApi.Models;
 
 public class UserProfile
 {

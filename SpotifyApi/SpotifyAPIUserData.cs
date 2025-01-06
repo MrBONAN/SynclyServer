@@ -1,7 +1,7 @@
 using RestSharp;
-using Infrastructure.API.SpotifyAPI.Models;
+using SpotifyApi.Models;
 
-namespace Infrastructure.API.SpotifyAPI;
+namespace SpotifyApi;
 
 public static partial class SpotifyApi
 {

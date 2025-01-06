@@ -1,5 +1,4 @@
-using Infrastructure.API.SpotifyAPI.Models;
-using SynclyServer.Dtos.Authorization.Spotify;
+using SpotifyApi.Models.Authorization;
 using SynclyServer.Models.Authorization;
 
 namespace SynclyServer.Mappers;

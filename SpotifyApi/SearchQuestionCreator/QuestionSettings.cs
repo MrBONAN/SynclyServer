@@ -1,4 +1,4 @@
-namespace Infrastructure.API;
+namespace SpotifyApi.SearchQuestionCreator;
 
 public enum QuestionFilter
 {
