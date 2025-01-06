@@ -13,14 +13,18 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     public DbSet<CurrentTrack> CurrentTracks { get; set; }
     public DbSet<RecentlyTrack> RecentlyTracks { get; set; }
     public DbSet<Location> Locations { get; set; }
-    
+
+
     //Join tables
     public DbSet<TrackArtist> TrackArtists { get; set; }
+    public DbSet<TopTracks> TopTracks { get; set; }
+    public DbSet<TopArtists> TopArtists { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureTrackArtistTable(modelBuilder);
-        //ConfigureLinks(modelBuilder);
+        ConfigureTopTracksTable(modelBuilder);
+        ConfigureTopArtistsTable(modelBuilder);
     }
 
     private void ConfigureTrackArtistTable(ModelBuilder modelBuilder)
@@ -40,8 +44,39 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
             .HasForeignKey(ta => ta.ArtistId);
     }
 
-    private void ConfigureLinks(ModelBuilder modelBuilder)
+    private void ConfigureTopTracksTable(ModelBuilder modelBuilder)
     {
-        //modelBuilder.Entity<>()
+        modelBuilder.Entity<TopTracks>()
+            .HasKey(ut => new { ut.UserId, ut.TrackId });
+        
+        modelBuilder.Entity<TopTracks>()
+            .HasOne(ut => ut.User)
+            .WithMany(u => u.TopTracks)
+            .HasForeignKey(ut => ut.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // modelBuilder.Entity<TopTracks>()
+        //     .HasOne(ut => ut.Track)
+        //     .WithMany()
+        //     .HasForeignKey(ut => ut.TrackId)
+        //     .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    private void ConfigureTopArtistsTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<TopArtists>()
+            .HasKey(ua => new { ua.UserId, ua.ArtistId});
+        
+        modelBuilder.Entity<TopArtists>()
+            .HasOne(ut => ut.User)
+            .WithMany(u => u.TopArtists)
+            .HasForeignKey(ut => ut.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
+
+        // modelBuilder.Entity<TopArtists>()
+        //     .HasOne(ut => ut.Artist)
+        //     .WithMany()
+        //     .HasForeignKey(ut => ut.ArtistId)
+        //     .OnDelete(DeleteBehavior.Restrict);
     }
 }
