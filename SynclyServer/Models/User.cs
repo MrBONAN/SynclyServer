@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using SynclyServer.Models.Authorization;
 using SynclyServer.Models.JoinTables;
 
 namespace SynclyServer.Models;
@@ -8,6 +9,8 @@ namespace SynclyServer.Models;
 public class User
 {
     public int Id { get; set; }
+    public int UserRegistrationId { get; set; }
+    public Registration Registration { get; set; } = null!;
     [MaxLength(50)] public string Name { get; set; } = string.Empty;
     public int? CurrentTrackId { get; set; }
     public List<TopTracks> TopTracks { get; set; } = new();

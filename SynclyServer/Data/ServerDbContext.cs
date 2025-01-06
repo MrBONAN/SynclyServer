@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using SynclyServer.Models;
+using SynclyServer.Models.Authorization;
 using SynclyServer.Models.JoinTables;
 
 namespace SynclyServer.Data;
@@ -12,6 +13,7 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     public DbSet<Links> Links { get; set; }
     public DbSet<CurrentTrack> CurrentTracks { get; set; }
     public DbSet<Location> Locations { get; set; }
+    public DbSet<Registration> Registrations { get; set; }
 
 
     //Join tables
