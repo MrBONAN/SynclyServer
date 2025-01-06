@@ -33,24 +33,30 @@ public class AuthorizationController(
         if (userRegistration is null)
         {
             var newUser = await CreateNewAccount(accessTokenDto, userProfile.Data);
-            return CreatedAtAction(nameof(UserController.GetById), new { id = newUser.Id },
+            return CreatedAtRoute("GetUserById", new { id = newUser.Id },
                 newUser.ToUserDto());
         }
 
-        userRegistration = await RegistrationRepository.UpdateAsync(userRegistration, accessTokenDto.ToRegistration());
-        return CreatedAtAction(nameof(UserController.GetById), new { id = userRegistration.UserId },
-            userRegistration.User.ToUserDto());
+        userRegistration =
+            await RegistrationRepository.UpdateAsync(userRegistration,
+                accessTokenDto.ToRegistration(userProfile.Data.Id!));
+        if (userRegistration is null)
+            return BadRequest("Something went wrong LOL");
+        var registeredUser = await UserRepository.GetByIdAsync(userRegistration.UserId!.Value);
+        return CreatedAtRoute("GetUserById", new { id = registeredUser.Id },
+            registeredUser.ToUserDto());
     }
 
     private async Task<User> CreateNewAccount(SpotifyAccessTokenDto accessTokenDto, UserProfile userProfile)
     {
         var registrationModel = accessTokenDto.ToRegistration(userProfile.Id!);
         registrationModel = await RegistrationRepository.CreateAsync(registrationModel);
-        
-        var linksModel = ModelsCreator.CreateLinks(userProfile.Images!.First().Url!, userProfile.Uri!, userProfile.Id!);
+        var imageUrl = userProfile.Images!.FirstOrDefault()?.Url!;
+        imageUrl ??= "";
+        var linksModel = ModelsCreator.CreateLinks(imageUrl, userProfile.ExternalUrls!.Spotify!, userProfile.Id!);
         linksModel = await LinksRepository.CreateAsync(linksModel);
         var locationModel = await LocationRepository.CreateAsync(new Location());
-        
+
         var userModel = ModelsCreator.CreateUser(userProfile, registrationModel, locationModel, linksModel);
         return await UserRepository.CreateAsync(userModel);
     }

@@ -62,6 +62,8 @@ public class UserRepository(ServerDbContext context, ILocationRepository locatio
     {
         await Context.Users.AddAsync(userModel);
         await Context.SaveChangesAsync();
-        return userModel;
+        userModel.Registration.UserId = userModel.Id;
+        await Context.SaveChangesAsync();
+        return (await GetByIdAsync(userModel.Id))!;
     }
 }

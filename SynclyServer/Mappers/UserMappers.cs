@@ -14,7 +14,10 @@ public static class UserMappers
             CurrentTrackId = userModel.CurrentTrackId,
             LocationId = userModel.LocationId,
             LinksId = userModel.LinksId!.Value,
-            Links = userModel.Links!.ToLinksDto()
+            Links = userModel.Links!.ToLinksDto(),
+            
+            RecentlyTracksUpdateDate = userModel.RecentlyTracksUpdateDate,
+            TopItemsUpdateDate = userModel.TopItemsUpdateDate
         };
     }
 }

@@ -12,7 +12,7 @@ using SynclyServer.Data;
 namespace SynclyServer.Migrations
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20250106121620_init")]
+    [Migration("20250106170615_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -46,6 +46,45 @@ namespace SynclyServer.Migrations
                     b.HasIndex("LinksId");
 
                     b.ToTable("Artists");
+                });
+
+            modelBuilder.Entity("SynclyServer.Models.Authorization.Registration", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<string>("AccessToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime>("ExpiresDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<string>("ExternalId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("PlatformName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("TokenType")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("UserRegistrations");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.JoinTables.CurrentTrack", b =>
@@ -189,9 +228,6 @@ namespace SynclyServer.Migrations
                     b.Property<decimal?>("Longitude")
                         .HasColumnType("decimal(9,6)");
 
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
                     b.HasKey("Id");
 
                     b.ToTable("Locations");
@@ -246,9 +282,21 @@ namespace SynclyServer.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<DateTime>("RecentlyTracksUpdateDate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<int>("RegistrationId")
+                        .HasColumnType("int");
+
+                    b.Property<DateTime>("TopItemsUpdateDate")
+                        .HasColumnType("datetime2");
+
                     b.HasKey("Id");
 
                     b.HasIndex("LinksId");
+
+                    b.HasIndex("RegistrationId")
+                        .IsUnique();
 
                     b.ToTable("Users");
                 });
@@ -353,7 +401,20 @@ namespace SynclyServer.Migrations
                         .WithMany()
                         .HasForeignKey("LinksId");
 
+                    b.HasOne("SynclyServer.Models.Authorization.Registration", "Registration")
+                        .WithOne("User")
+                        .HasForeignKey("SynclyServer.Models.User", "RegistrationId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
                     b.Navigation("Links");
+
+                    b.Navigation("Registration");
+                });
+
+            modelBuilder.Entity("SynclyServer.Models.Authorization.Registration", b =>
+                {
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.Track", b =>

@@ -1,3 +1,5 @@
+using Newtonsoft.Json;
+
 namespace SynclyServer.Dtos.Authorization.Spotify;
 
 public class SpotifyAccessTokenDto

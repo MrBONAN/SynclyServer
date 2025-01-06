@@ -28,6 +28,7 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
         ConfigureTopTracksTable(modelBuilder);
         ConfigureTopArtistsTable(modelBuilder);
         ConfigureRecentlyTracksTable(modelBuilder);
+        ConfigureUserRegistrationRelationship(modelBuilder);
     }
 
     private void ConfigureTrackArtistTable(ModelBuilder modelBuilder)
@@ -94,5 +95,12 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
             .WithMany(u => u.RecentlyTracks)
             .HasForeignKey(ut => ut.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+    }
+    private void ConfigureUserRegistrationRelationship(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Registration>()
+            .HasOne(r => r.User)
+            .WithOne(u => u.Registration)
+            .HasForeignKey<User>(u => u.RegistrationId);
     }
 }

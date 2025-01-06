@@ -18,12 +18,39 @@ public static partial class SpotifyApi
 
     private static void LoadEnvFiles()
     {
-        DotEnv.Fluent().WithExceptions().WithEnvFiles("Spotify.env")
-            .Load();
+        LoadEnvFile("../SpotifyApi/Spotify.env");
         ClientId = Environment.GetEnvironmentVariable("CLIENT_ID") ??
                    throw new FileLoadException("App client id was not found");
         ClientSecret = Environment.GetEnvironmentVariable("CLIENT_SECRET") ??
                        throw new FileLoadException("App client secret was not found");
+    }
+    
+    public static void LoadEnvFile(string filePath)
+    {
+        var path = Directory.GetCurrentDirectory();
+        if (!File.Exists(filePath))
+        {
+            throw new FileNotFoundException($"Файл не найден: {filePath}");
+        }
+
+        var lines = File.ReadAllLines(filePath);
+        foreach (var line in lines)
+        {
+            if (string.IsNullOrWhiteSpace(line) || line.TrimStart().StartsWith("#"))
+                continue;
+
+            var separatorIndex = line.IndexOf('=');
+            if (separatorIndex < 0)
+            {
+                Console.WriteLine($"Некорректная строка в .env файле: {line}");
+                continue;
+            }
+
+            var key = line.Substring(0, separatorIndex).Trim();
+            var value = line.Substring(separatorIndex + 1).Trim();
+
+            Environment.SetEnvironmentVariable(key, value);
+        }
     }
 
     public static async Task<AccessToken?> GetAppAccessToken()

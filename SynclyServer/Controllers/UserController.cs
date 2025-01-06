@@ -17,7 +17,7 @@ public class UserController(IUserRepository userRepository) : ControllerBase
         return Ok(users.Select(u => u.ToUserDto()));
     }
 
-    [HttpGet("{id:int}")]
+    [HttpGet("{id:int}", Name = "GetUserById")]
     public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var userModel = await UserRepository.GetByIdAsync(id);

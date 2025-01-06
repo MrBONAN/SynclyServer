@@ -32,7 +32,6 @@ namespace SynclyServer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
                     Latitude = table.Column<decimal>(type: "decimal(9,6)", nullable: true),
                     Longitude = table.Column<decimal>(type: "decimal(9,6)", nullable: true),
                     LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false)
@@ -56,6 +55,25 @@ namespace SynclyServer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_ServiceLinks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "UserRegistrations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlatformName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccessToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TokenType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiresDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRegistrations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -103,10 +121,13 @@ namespace SynclyServer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
+                    RegistrationId = table.Column<int>(type: "int", nullable: false),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CurrentTrackId = table.Column<int>(type: "int", nullable: true),
                     LocationId = table.Column<int>(type: "int", nullable: true),
-                    LinksId = table.Column<int>(type: "int", nullable: true)
+                    LinksId = table.Column<int>(type: "int", nullable: true),
+                    RecentlyTracksUpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    TopItemsUpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -116,6 +137,12 @@ namespace SynclyServer.Migrations
                         column: x => x.LinksId,
                         principalTable: "ServiceLinks",
                         principalColumn: "Id");
+                    table.ForeignKey(
+                        name: "FK_Users_UserRegistrations_RegistrationId",
+                        column: x => x.RegistrationId,
+                        principalTable: "UserRegistrations",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -251,6 +278,12 @@ namespace SynclyServer.Migrations
                 name: "IX_Users_LinksId",
                 table: "Users",
                 column: "LinksId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_RegistrationId",
+                table: "Users",
+                column: "RegistrationId",
+                unique: true);
         }
 
         /// <inheritdoc />
@@ -285,6 +318,9 @@ namespace SynclyServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "ServiceLinks");
+
+            migrationBuilder.DropTable(
+                name: "UserRegistrations");
         }
     }
 }

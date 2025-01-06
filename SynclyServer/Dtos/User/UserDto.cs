@@ -11,4 +11,7 @@ public class UserDto
     [JsonIgnore] public int? LocationId { get; set; }
     [JsonIgnore] public int LinksId { get; set; }
     public LinksDto Links { get; set; } = null!;
+    
+    public DateTime RecentlyTracksUpdateDate { get; set; } = DateTime.MinValue;
+    public DateTime TopItemsUpdateDate { get; set; } = DateTime.MinValue;
 }

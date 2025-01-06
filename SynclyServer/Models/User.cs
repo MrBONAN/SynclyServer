@@ -19,4 +19,7 @@ public class User
     public int? LocationId { get; set; }
     public int? LinksId { get; set; }
     public Links? Links { get; set; }
+
+    public DateTime RecentlyTracksUpdateDate { get; set; } = DateTime.MinValue;
+    public DateTime TopItemsUpdateDate { get; set; } = DateTime.MinValue;
 }
