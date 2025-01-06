@@ -19,12 +19,11 @@ public class TrackController(ITrackRepository trackRepository) : ControllerBase
     }
     
     [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById(int id)
+    public async Task<IActionResult> GetById([FromRoute] int id)
     {
         var track = await TrackRepository.GetByIdAsync(id);
         if (track is null)
             return NotFound();
         return Ok(track.ToTrackDto());
     }
-
 }

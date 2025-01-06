@@ -8,8 +8,8 @@ public class TrackDto
 {
     public int Id { get; set; }
     public string Name { get; set; } = string.Empty;
-    public List<ArtistDto> Artists { get; set; } = new();
-    public string Genre { get; set; } = string.Empty;
+    public List<ArtistDto>? Artists { get; set; } = new();
+    public string? Genre { get; set; }
     [JsonIgnore] public int LinksId { get; set; }
-    public LinksDto Links { get; set; }
+    public LinksDto Links { get; set; } = null!;
 }

@@ -9,10 +9,11 @@ public class User
 {
     public int Id { get; set; }
     [MaxLength(50)] public string Name { get; set; } = string.Empty;
-    public int CurrentTrackId { get; set; }
+    public int? CurrentTrackId { get; set; }
     public List<TopTracks> TopTracks { get; set; } = new();
     public List<TopArtists> TopArtists { get; set; } = new();
-    public int LocationId { get; set; }
-    public int LinksId { get; set; }
-    public Links Links { get; set; }
+    public List<RecentlyTracks> RecentlyTracks { get; set; } = new();
+    public int? LocationId { get; set; }
+    public int? LinksId { get; set; }
+    public Links? Links { get; set; }
 }

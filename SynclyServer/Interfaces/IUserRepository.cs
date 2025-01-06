@@ -6,6 +6,7 @@ public interface IUserRepository
 {
     Task<List<User>> GetAllAsync();
     Task<User?> GetByIdAsync(int id);
-    public Task<List<Track>?> GetTopTracksAsync(int id);
-    public Task<List<Artist>?> GetTopArtistsAsync(int id);
+    public Task<List<Track>?> GetTopTracksAsync(int userId);
+    public Task<List<Artist>?> GetTopArtistsAsync(int userId);
+    public Task<List<Track>?> GetRecentlyTracks(int userId);
 }

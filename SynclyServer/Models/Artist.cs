@@ -9,6 +9,6 @@ public class Artist
     public int Id { get; set; }
     [MaxLength(50)] public string Name { get; set; } = string.Empty;
     //public List<Track> Tracks { get; set; } = new();
-    public int LinksId { get; set; }
-    public Links Links { get; set; }
+    public int? LinksId { get; set; }
+    public Links? Links { get; set; }
 }

@@ -11,8 +11,8 @@ public static class LocationMappers
         {
             Id = locationModel.Id,
             UserId = locationModel.UserId,
-            Latitude = locationModel.Latitude,
-            Longitude = locationModel.Longitude,
+            Latitude = locationModel.Latitude!.Value,
+            Longitude = locationModel.Longitude!.Value,
             LastUpdate = locationModel.LastUpdate
         };
     }

@@ -11,7 +11,6 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     public DbSet<Track> Tracks { get; set; }
     public DbSet<Links> Links { get; set; }
     public DbSet<CurrentTrack> CurrentTracks { get; set; }
-    public DbSet<RecentlyTrack> RecentlyTracks { get; set; }
     public DbSet<Location> Locations { get; set; }
 
 
@@ -19,12 +18,14 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     public DbSet<TrackArtist> TrackArtists { get; set; }
     public DbSet<TopTracks> TopTracks { get; set; }
     public DbSet<TopArtists> TopArtists { get; set; }
+    public DbSet<RecentlyTracks> RecentlyTracks { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureTrackArtistTable(modelBuilder);
         ConfigureTopTracksTable(modelBuilder);
         ConfigureTopArtistsTable(modelBuilder);
+        ConfigureRecentlyTracksTable(modelBuilder);
     }
 
     private void ConfigureTrackArtistTable(ModelBuilder modelBuilder)
@@ -41,7 +42,8 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
         modelBuilder.Entity<TrackArtist>()
             .HasOne(ta => ta.Artist)
             .WithMany()
-            .HasForeignKey(ta => ta.ArtistId);
+            .HasForeignKey(ta => ta.ArtistId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private void ConfigureTopTracksTable(ModelBuilder modelBuilder)
@@ -78,5 +80,17 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
         //     .WithMany()
         //     .HasForeignKey(ut => ut.ArtistId)
         //     .OnDelete(DeleteBehavior.Restrict);
+    }
+
+    private void ConfigureRecentlyTracksTable(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<RecentlyTracks>()
+            .HasKey(ut => new { ut.UserId, ut.TrackId});
+        
+        modelBuilder.Entity<RecentlyTracks>()
+            .HasOne(ut => ut.User)
+            .WithMany(u => u.RecentlyTracks)
+            .HasForeignKey(ut => ut.UserId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 }

@@ -9,5 +9,5 @@ public class ArtistDto
     public string Name { get; set; } = string.Empty;
     //public List<TrackDto> Tracks { get; set; } = new();
     [JsonIgnore] public int LinksId { get; set; }
-    public LinksDto Links { get; set; }
+    public LinksDto Links { get; set; } = null!;
 }
