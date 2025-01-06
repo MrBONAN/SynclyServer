@@ -2,6 +2,8 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SynclyServer", "SynclyServer\SynclyServer.csproj", "{1DCE0E82-D48E-4813-9BE2-B0103E292AEB}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "SpotifyApi", "SpotifyApi\SpotifyApi.csproj", "{DC0859B5-A980-4DD8-BBDC-B3EB44008899}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -12,5 +14,9 @@ Global
 		{1DCE0E82-D48E-4813-9BE2-B0103E292AEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{1DCE0E82-D48E-4813-9BE2-B0103E292AEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{1DCE0E82-D48E-4813-9BE2-B0103E292AEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{DC0859B5-A980-4DD8-BBDC-B3EB44008899}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{DC0859B5-A980-4DD8-BBDC-B3EB44008899}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{DC0859B5-A980-4DD8-BBDC-B3EB44008899}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{DC0859B5-A980-4DD8-BBDC-B3EB44008899}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 EndGlobal
