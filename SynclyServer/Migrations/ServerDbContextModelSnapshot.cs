@@ -40,6 +40,8 @@ namespace SynclyServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LinksId");
+
                     b.ToTable("Artists");
                 });
 
@@ -113,6 +115,31 @@ namespace SynclyServer.Migrations
                     b.ToTable("ServiceLinks");
                 });
 
+            modelBuilder.Entity("SynclyServer.Models.Location", b =>
+                {
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<DateTime>("LastUpdate")
+                        .HasColumnType("datetime2");
+
+                    b.Property<decimal>("Latitude")
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<decimal>("Longitude")
+                        .HasColumnType("decimal(9,6)");
+
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
+
+                    b.ToTable("Locations");
+                });
+
             modelBuilder.Entity("SynclyServer.Models.RecentlyTrack", b =>
                 {
                     b.Property<int>("Id")
@@ -143,9 +170,6 @@ namespace SynclyServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
-                    b.Property<int?>("ArtistId")
-                        .HasColumnType("int");
-
                     b.Property<string>("Genre")
                         .IsRequired()
                         .HasMaxLength(20)
@@ -161,7 +185,7 @@ namespace SynclyServer.Migrations
 
                     b.HasKey("Id");
 
-                    b.HasIndex("ArtistId");
+                    b.HasIndex("LinksId");
 
                     b.ToTable("Tracks");
                 });
@@ -177,6 +201,9 @@ namespace SynclyServer.Migrations
                     b.Property<int>("LinksId")
                         .HasColumnType("int");
 
+                    b.Property<int>("LocationId")
+                        .HasColumnType("int");
+
                     b.Property<string>("Name")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -184,32 +211,20 @@ namespace SynclyServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("LinksId");
+
                     b.ToTable("Users");
                 });
 
-            modelBuilder.Entity("SynclyServer.Models.UserLocation", b =>
+            modelBuilder.Entity("SynclyServer.Models.Artist", b =>
                 {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
+                    b.HasOne("SynclyServer.Models.Links", "Links")
+                        .WithMany()
+                        .HasForeignKey("LinksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("LastUpdate")
-                        .HasColumnType("datetime2");
-
-                    b.Property<decimal>("Latitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<decimal>("Longitude")
-                        .HasColumnType("decimal(18,2)");
-
-                    b.Property<int>("UserId")
-                        .HasColumnType("int");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("UserLocations");
+                    b.Navigation("Links");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.JoinTables.TrackArtist", b =>
@@ -223,7 +238,7 @@ namespace SynclyServer.Migrations
                     b.HasOne("SynclyServer.Models.Track", "Track")
                         .WithMany("TrackArtists")
                         .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.Navigation("Artist");
@@ -233,14 +248,24 @@ namespace SynclyServer.Migrations
 
             modelBuilder.Entity("SynclyServer.Models.Track", b =>
                 {
-                    b.HasOne("SynclyServer.Models.Artist", null)
-                        .WithMany("Tracks")
-                        .HasForeignKey("ArtistId");
+                    b.HasOne("SynclyServer.Models.Links", "Links")
+                        .WithMany()
+                        .HasForeignKey("LinksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Links");
                 });
 
-            modelBuilder.Entity("SynclyServer.Models.Artist", b =>
+            modelBuilder.Entity("SynclyServer.Models.User", b =>
                 {
-                    b.Navigation("Tracks");
+                    b.HasOne("SynclyServer.Models.Links", "Links")
+                        .WithMany()
+                        .HasForeignKey("LinksId")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
+
+                    b.Navigation("Links");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.Track", b =>

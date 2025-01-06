@@ -12,7 +12,7 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     public DbSet<Links> Links { get; set; }
     public DbSet<CurrentTrack> CurrentTracks { get; set; }
     public DbSet<RecentlyTrack> RecentlyTracks { get; set; }
-    public DbSet<UserLocation> UserLocations { get; set; }
+    public DbSet<Location> Locations { get; set; }
     
     //Join tables
     public DbSet<TrackArtist> TrackArtists { get; set; }
@@ -20,7 +20,7 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         ConfigureTrackArtistTable(modelBuilder);
-        ConfigureLinks(modelBuilder);
+        //ConfigureLinks(modelBuilder);
     }
 
     private void ConfigureTrackArtistTable(ModelBuilder modelBuilder)
@@ -31,7 +31,8 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
         modelBuilder.Entity<TrackArtist>()
             .HasOne(ta => ta.Track)
             .WithMany(t => t.TrackArtists)
-            .HasForeignKey(ta => ta.TrackId);
+            .HasForeignKey(ta => ta.TrackId)
+            .OnDelete(DeleteBehavior.Restrict);
 
         modelBuilder.Entity<TrackArtist>()
             .HasOne(ta => ta.Artist)

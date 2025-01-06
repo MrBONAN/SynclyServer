@@ -6,25 +6,11 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace SynclyServer.Migrations
 {
     /// <inheritdoc />
-    public partial class addNewModels : Migration
+    public partial class init : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
         {
-            migrationBuilder.CreateTable(
-                name: "Artists",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    LinksId = table.Column<int>(type: "int", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Artists", x => x.Id);
-                });
-
             migrationBuilder.CreateTable(
                 name: "CurrentTracks",
                 columns: table => new
@@ -38,6 +24,22 @@ namespace SynclyServer.Migrations
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_CurrentTracks", x => x.Id);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Locations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: false),
+                    Latitude = table.Column<decimal>(type: "decimal(9,6)", nullable: false),
+                    Longitude = table.Column<decimal>(type: "decimal(9,6)", nullable: false),
+                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Locations", x => x.Id);
                 });
 
             migrationBuilder.CreateTable(
@@ -72,23 +74,7 @@ namespace SynclyServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserLocations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: false),
-                    Latitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    Longitude = table.Column<decimal>(type: "decimal(18,2)", nullable: false),
-                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserLocations", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
-                name: "Users",
+                name: "Artists",
                 columns: table => new
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
@@ -98,7 +84,13 @@ namespace SynclyServer.Migrations
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.PrimaryKey("PK_Artists", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Artists_ServiceLinks_LinksId",
+                        column: x => x.LinksId,
+                        principalTable: "ServiceLinks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -109,17 +101,38 @@ namespace SynclyServer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     Genre = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
-                    LinksId = table.Column<int>(type: "int", nullable: false),
-                    ArtistId = table.Column<int>(type: "int", nullable: true)
+                    LinksId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
                     table.PrimaryKey("PK_Tracks", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Tracks_Artists_ArtistId",
-                        column: x => x.ArtistId,
-                        principalTable: "Artists",
-                        principalColumn: "Id");
+                        name: "FK_Tracks_ServiceLinks_LinksId",
+                        column: x => x.LinksId,
+                        principalTable: "ServiceLinks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Users",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    LocationId = table.Column<int>(type: "int", nullable: false),
+                    LinksId = table.Column<int>(type: "int", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Users", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Users_ServiceLinks_LinksId",
+                        column: x => x.LinksId,
+                        principalTable: "ServiceLinks",
+                        principalColumn: "Id",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -143,8 +156,13 @@ namespace SynclyServer.Migrations
                         column: x => x.TrackId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                 });
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Artists_LinksId",
+                table: "Artists",
+                column: "LinksId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_JoinTrackArtist_ArtistId",
@@ -152,9 +170,14 @@ namespace SynclyServer.Migrations
                 column: "ArtistId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Tracks_ArtistId",
+                name: "IX_Tracks_LinksId",
                 table: "Tracks",
-                column: "ArtistId");
+                column: "LinksId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_Users_LinksId",
+                table: "Users",
+                column: "LinksId");
         }
 
         /// <inheritdoc />
@@ -167,22 +190,22 @@ namespace SynclyServer.Migrations
                 name: "JoinTrackArtist");
 
             migrationBuilder.DropTable(
+                name: "Locations");
+
+            migrationBuilder.DropTable(
                 name: "RecentlyTracks");
-
-            migrationBuilder.DropTable(
-                name: "ServiceLinks");
-
-            migrationBuilder.DropTable(
-                name: "UserLocations");
 
             migrationBuilder.DropTable(
                 name: "Users");
 
             migrationBuilder.DropTable(
+                name: "Artists");
+
+            migrationBuilder.DropTable(
                 name: "Tracks");
 
             migrationBuilder.DropTable(
-                name: "Artists");
+                name: "ServiceLinks");
         }
     }
 }

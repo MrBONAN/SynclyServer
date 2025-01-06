@@ -18,7 +18,7 @@ public class TrackController(ITrackRepository trackRepository) : ControllerBase
         return Ok(tracks.Select(t => t.ToTrackDto()));
     }
     
-    [HttpGet("{id}")]
+    [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById(int id)
     {
         var track = await TrackRepository.GetByIdAsync(id);

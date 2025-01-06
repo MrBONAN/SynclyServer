@@ -11,7 +11,7 @@ public static class UserMappers
         {
             Id = userModel.Id,
             Name = userModel.Name,
-            // TODO заменить на возврат из таблицы Links
+            LocationId = userModel.LocationId,
             LinksId = userModel.LinksId,
             Links = userModel.Links.ToLinksDto()
         };
