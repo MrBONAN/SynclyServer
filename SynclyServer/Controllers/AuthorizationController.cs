@@ -1,6 +1,7 @@
 using Microsoft.AspNetCore.Mvc;
 using SpotifyApi.Models;
 using SpotifyApi.Models.Authorization;
+using SynclyServer.ApiFunctions.Spotify;
 using SynclyServer.Interfaces;
 using SynclyServer.Mappers;
 using SynclyServer.Models;

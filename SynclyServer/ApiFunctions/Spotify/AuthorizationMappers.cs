@@ -1,7 +1,7 @@
 using SpotifyApi.Models.Authorization;
 using SynclyServer.Models.Authorization;
 
-namespace SynclyServer.Mappers;
+namespace SynclyServer.ApiFunctions.Spotify;
 
 public static class AuthorizationMappers
 {

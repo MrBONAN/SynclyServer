@@ -1,6 +1,8 @@
 using SpotifyApi.Models;
 using SynclyServer.Models;
 using SynclyServer.Models.Authorization;
+using SynclyServer.Repository;
+using Track = SynclyServer.Models.Track;
 
 namespace SynclyServer.Mappers;
 
@@ -26,5 +28,25 @@ public static class ModelsCreator
             ExternalId = objectPlatformId,
             PlatformName = "spotify"
         };
+    }
+
+    public static Track CreateTrack(SpotifyApi.Models.Track spotifyTrack)
+    {
+        var imageUrl = spotifyTrack.Images!.FirstOrDefault()?.Url!;
+        imageUrl ??= "";
+        var linksModel = new Links()
+        {
+            ExternalImageLink = imageUrl,
+            ExternalLink = spotifyTrack.ExternalUrls!.Spotify!,
+            ExternalId = spotifyTrack.Id!,
+            PlatformName = "spotify"
+        };
+        var trackModel = new Track()
+        {
+            Name = spotifyTrack.Name!,
+            Genre = null,
+            Links = linksModel
+        };
+        return trackModel;
     }
 }
