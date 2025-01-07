@@ -55,12 +55,12 @@ public class AuthorizationController(
         var locationModel = new Location();
         
         var userModel = ModelsCreator.CreateUser(userProfile, registrationModel, locationModel, linksModel);
-        registrationModel.User = userModel;
         await LocationRepository.CreateAsync(locationModel);
         await LinksRepository.CreateAsync(linksModel);
         await RegistrationRepository.CreateAsync(registrationModel);
-        userModel.Id = 0;
         registrationModel.UserId = 0;
+        registrationModel.User = userModel;
+        userModel.Id = 0;
         userModel.RegistrationId = registrationModel.Id;
         return await UserRepository.CreateAsync(userModel);
     }
