@@ -1,3 +1,4 @@
+using SpotifyApi.Models.Authorization;
 using SynclyServer.Models.Authorization;
 
 namespace SynclyServer.Interfaces;
@@ -9,4 +10,5 @@ public interface IRegistrationRepository
     Task<Registration> CreateAsync(Registration registrationModel);
     Task<Registration?> UpdateAsync(int id, Registration updateRegistrationModel);
     Task<Registration?> UpdateAsync(Registration oldRegistrationModel, Registration updateRegistrationModel);
+    Task<Registration?> GetRegistrationDataByUserIdAsync(int userId);
 }

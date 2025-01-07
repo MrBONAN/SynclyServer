@@ -1,11 +1,7 @@
 using Microsoft.EntityFrameworkCore;
-using SpotifyApi;
-using SpotifyApi.Models.Authorization;
 using SynclyServer.Data;
 using SynclyServer.Interfaces;
-using SynclyServer.Mappers;
 using SynclyServer.Models;
-using SynclyServer.Models.Authorization;
 
 namespace SynclyServer.Repository;
 
@@ -35,20 +31,6 @@ public class UserRepository(
             .FirstOrDefaultAsync(u => u.Id == id);
     }
 
-    public async Task<List<Track>?> GetTopTracksAsync(int userId)
-    {
-        var user = await Context.Users
-            .Include(u => u.TopTracks.OrderBy(ua => ua.Position).Take(MaxTopTracks))
-            .ThenInclude(ut => ut.Track)
-            .ThenInclude(t => t!.Links)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        if (user is null)
-            return null;
-        if (user.TopItemsUpdateDate.Day - DateTime.Now.Day > 0)
-            user = await UpdateUserTopTracks(user);
-        return user.TopTracks.Select(ut => ut.Track).ToList()!;
-    }
-
     public async Task<List<Artist>?> GetTopArtistsAsync(int userId)
     {
         var user = await Context.Users
@@ -76,64 +58,5 @@ public class UserRepository(
         userModel.Registration.UserId = userModel.Id;
         await Context.SaveChangesAsync();
         return (await GetByIdAsync(userModel.Id))!;
-    }
-
-    public async Task<Registration?> GetRegistrationDataByUserIdAsync(int id)
-    {
-        var registrationModel = await Context.Users
-            .Where(u => u.Id == id)
-            .Select(u => new Registration()
-            {
-                Id = u.RegistrationId,
-                AccessToken = u.Registration.AccessToken,
-                ExpiresDate = u.Registration.ExpiresDate,
-                RefreshToken = u.Registration.RefreshToken
-            })
-            .FirstOrDefaultAsync();
-        if (registrationModel is null)
-            return null;
-        if ((registrationModel.ExpiresDate - DateTime.Now).TotalSeconds < 10)
-        {
-            var newAccessToken = await SpotifyApi.SpotifyApi.RefreshTokenAsync(registrationModel.RefreshToken);
-            if (newAccessToken is null)
-                return null;
-            return await UpdateAccessToken(registrationModel, newAccessToken);
-        }
-
-        return registrationModel;
-    }
-
-    private async Task<Registration> UpdateAccessToken(Registration registrationModel,
-        SpotifyAccessTokenDto newAccessToken)
-    {
-        registrationModel.AccessToken = newAccessToken.AccessToken;
-        registrationModel.RefreshToken = newAccessToken.RefreshToken;
-        registrationModel.ExpiresDate = newAccessToken.ExpiresDate;
-        registrationModel.TokenType = newAccessToken.TokenType;
-        await Context.SaveChangesAsync();
-        return registrationModel;
-    }
-
-    private async Task<User?> UpdateUserTopTracks(User userModel)
-    {
-        var registrationData = await GetRegistrationDataByUserIdAsync(userModel.Id);
-        var topTracks =
-            await SpotifyApi.SpotifyApi.GetUserTopItemsAsync<SpotifyApi.Models.Track>(registrationData!.AccessToken,
-                MaxTopTracks);
-        if (topTracks.Result is not ApiResult.Success)
-            return null;
-        var topList = topTracks.Data!;
-        var tracksInDb = await TrackRepository.GetByIdsAsync(topList.Select(t => t.Id)!);
-        var nonexistentTracks = topList.Select(t => t.Id).Except(tracksInDb.Select(t => t.Links!.ExternalId));
-        var newTracksResult =
-            await SpotifyApi.SpotifyApi.GetSeveralEntitiesById<SpotifyApi.Models.Track>(registrationData!.AccessToken,
-                nonexistentTracks!);
-        if (newTracksResult.Result is not ApiResult.Success)
-            return null;
-        var newTracks = newTracksResult.Data!;
-        foreach (var trackModel in newTracks.Select(ModelsCreator.CreateTrack))
-            tracksInDb.Add(await TrackRepository.CreateAsync(trackModel));
-        // TODO: написать match для новый треков к id, чтобы сохранить порядок топа треков
-        
     }
 }

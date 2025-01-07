@@ -59,12 +59,12 @@ public class PkceAccessToken
 
     public SpotifyAccessTokenDto ConvertToAccessTokenDto()
     {
-        var ExpiresDate = CreationDate.AddSeconds(ExpiresIn!.Value);
+        var expiresDate = CreationDate.AddSeconds(ExpiresIn!.Value);
         return new SpotifyAccessTokenDto()
         {
             AccessToken = AccessToken!,
             TokenType = TokenType!,
-            ExpiresDate = ExpiresDate,
+            ExpiresDate = expiresDate,
             RefreshToken = RefreshToken!
         };
     }
