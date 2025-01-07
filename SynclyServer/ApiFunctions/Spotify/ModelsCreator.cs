@@ -2,6 +2,7 @@ using SpotifyApi.Models;
 using SynclyServer.Models;
 using SynclyServer.Models.Authorization;
 using SynclyServer.Repository;
+using Artist = SynclyServer.Models.Artist;
 using Track = SynclyServer.Models.Track;
 
 namespace SynclyServer.Mappers;
@@ -51,5 +52,24 @@ public static class ModelsCreator
             Links = linksModel
         };
         return trackModel;
+    }
+    
+    public static Artist CreateArtist(SpotifyApi.Models.Artist spotifyArtist)
+    {
+        var imageUrl = spotifyArtist.Images!.FirstOrDefault()?.Url!;
+        imageUrl ??= "";
+        var linksModel = new Links()
+        {
+            ExternalImageLink = imageUrl,
+            ExternalLink = spotifyArtist.ExternalUrls!.Spotify!,
+            ExternalId = spotifyArtist.Id!,
+            PlatformName = "spotify"
+        };
+        var artistModel = new Artist()
+        {
+            Name = spotifyArtist.Name!,
+            Links = linksModel
+        };
+        return artistModel;
     }
 }
