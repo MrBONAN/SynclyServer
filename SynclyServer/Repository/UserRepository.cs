@@ -14,8 +14,6 @@ public class UserRepository(
     private readonly ILocationRepository LocationRepository = locationRepository;
     private readonly ITrackRepository TrackRepository = trackRepository;
 
-    private const int MaxRecentlyTracks = 10;
-
     public async Task<List<User>> GetAllAsync()
     {
         return await Context.Users
@@ -40,15 +38,15 @@ public class UserRepository(
     //     return user?.TopArtists.Select(ua => ua.Artist).ToList()!;
     // }
 
-    public async Task<List<Track>?> GetRecentlyTracksAsync(int userId)
-    {
-        var user = await Context.Users
-            .Include(u => u.RecentlyTracks.OrderBy(ut => ut.Position).Take(MaxRecentlyTracks))
-            .ThenInclude(ut => ut.Track)
-            .ThenInclude(t => t!.Links)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        return user?.RecentlyTracks.Select(ut => ut.Track).ToList()!;
-    }
+    // public async Task<List<Track>?> GetRecentlyTracksAsync(int userId)
+    // {
+    //     var user = await Context.Users
+    //         .Include(u => u.RecentlyTracks.OrderBy(ut => ut.Position).Take(MaxRecentlyTracks))
+    //         .ThenInclude(ut => ut.Track)
+    //         .ThenInclude(t => t!.Links)
+    //         .FirstOrDefaultAsync(u => u.Id == userId);
+    //     return user?.RecentlyTracks.Select(ut => ut.Track).ToList()!;
+    // }
 
     public async Task<User> CreateAsync(User userModel)
     {
