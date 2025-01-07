@@ -12,10 +12,13 @@ public static class ModelsCreator
     {
         return new User() 
         {
-            RegistrationId = registrationModel.Id,
+            Registration = registrationModel,
             Name = userProfile.DisplayName!,
-            LinksId = linksModel.Id,
-            LocationId = locationModel.Id,
+            Location = locationModel,
+            Links = linksModel
+            // RegistrationId = registrationModel.Id,
+            // LinksId = linksModel.Id,
+            // LocationId = locationModel.Id,
         };
     }
 

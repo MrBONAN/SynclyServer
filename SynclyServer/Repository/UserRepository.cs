@@ -55,8 +55,6 @@ public class UserRepository(
     {
         await Context.Users.AddAsync(userModel);
         await Context.SaveChangesAsync();
-        userModel.Registration.UserId = userModel.Id;
-        await Context.SaveChangesAsync();
-        return (await GetByIdAsync(userModel.Id))!;
+        return userModel;
     }
 }

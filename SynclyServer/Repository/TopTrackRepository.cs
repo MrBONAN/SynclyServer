@@ -24,6 +24,7 @@ public class TopTrackRepository(
             .Include(u => u.TopTracks.OrderBy(ua => ua.Position).Take(MaxTopTracks))
             .ThenInclude(ut => ut.Track)
             .ThenInclude(t => t!.Links)
+            .Include(u => u.Registration)
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
@@ -70,14 +71,10 @@ public class TopTrackRepository(
 
         var tracksInDb = await TrackRepository.GetByIdsAsync(topList.Select(t => t.Id)!);
         var nonexistentTracks = topList.Select(t => t.Id).Except(tracksInDb.Select(t => t.Links!.ExternalId));
-        var newTracksResult =
-            await SpotifyApi.SpotifyApi.GetSeveralEntitiesById<SpotifyApi.Models.Track>(registrationData!.AccessToken,
-                nonexistentTracks!);
-        if (newTracksResult.Result is not ApiResult.Success)
-            return null;
-
-        var newTracks = newTracksResult.Data!;
-        foreach (var trackModel in newTracks.Select(ModelsCreator.CreateTrack))
+        var newTracks = topList
+            .Where(t => nonexistentTracks.Contains(t.Id))
+            .Select(ModelsCreator.CreateTrack);
+        foreach (var trackModel in newTracks)
             tracksInDb.Add(await TrackRepository.CreateAsync(trackModel));
         var tracksInDbByPositionsInTop = tracksInDb
             .Select(track => (topList.FindIndex(tl => tl.Id == track.Links!.ExternalId), track))
@@ -91,12 +88,10 @@ public class TopTrackRepository(
         if (tracksInDb.Count > userModel.TopTracks.Count)
         {
             var startIndex = userModel.TopTracks.Count + 1;
-            userModel.TopTracks.AddRange(await CreateNewTopTracksAsync(userModel.Id,
+            await CreateNewTopTracksAsync(userModel.Id,
                 tracksInDbByPositionsInTop.Select(it => it.track.Id),
-                startIndex));
+                startIndex);
         }
-        //TODO подумать над решением этой проблемы: по идее надо бы отдельно хранить время всё-таки
-        //userModel.TopItemsUpdateDate = DateTime.Now;
         await Context.SaveChangesAsync();
         return userModel;
     }

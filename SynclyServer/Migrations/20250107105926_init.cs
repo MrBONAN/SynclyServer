@@ -58,25 +58,6 @@ namespace SynclyServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "UserRegistrations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    UserId = table.Column<int>(type: "int", nullable: true),
-                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    PlatformName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    AccessToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    TokenType = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ExpiresDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_UserRegistrations", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "Artists",
                 columns: table => new
                 {
@@ -121,7 +102,7 @@ namespace SynclyServer.Migrations
                 {
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
-                    RegistrationId = table.Column<int>(type: "int", nullable: false),
+                    RegistrationId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CurrentTrackId = table.Column<int>(type: "int", nullable: true),
                     LocationId = table.Column<int>(type: "int", nullable: true),
@@ -133,16 +114,15 @@ namespace SynclyServer.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
+                        name: "FK_Users_Locations_LocationId",
+                        column: x => x.LocationId,
+                        principalTable: "Locations",
+                        principalColumn: "Id");
+                    table.ForeignKey(
                         name: "FK_Users_ServiceLinks_LinksId",
                         column: x => x.LinksId,
                         principalTable: "ServiceLinks",
                         principalColumn: "Id");
-                    table.ForeignKey(
-                        name: "FK_Users_UserRegistrations_RegistrationId",
-                        column: x => x.RegistrationId,
-                        principalTable: "UserRegistrations",
-                        principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -244,6 +224,30 @@ namespace SynclyServer.Migrations
                         onDelete: ReferentialAction.Restrict);
                 });
 
+            migrationBuilder.CreateTable(
+                name: "UserRegistrations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    ExternalId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    PlatformName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    AccessToken = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    TokenType = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    ExpiresDate = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_UserRegistrations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_UserRegistrations_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
+                });
+
             migrationBuilder.CreateIndex(
                 name: "IX_Artists_LinksId",
                 table: "Artists",
@@ -275,15 +279,21 @@ namespace SynclyServer.Migrations
                 column: "LinksId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_UserRegistrations_UserId",
+                table: "UserRegistrations",
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_Users_LinksId",
                 table: "Users",
                 column: "LinksId");
 
             migrationBuilder.CreateIndex(
-                name: "IX_Users_RegistrationId",
+                name: "IX_Users_LocationId",
                 table: "Users",
-                column: "RegistrationId",
-                unique: true);
+                column: "LocationId");
         }
 
         /// <inheritdoc />
@@ -296,9 +306,6 @@ namespace SynclyServer.Migrations
                 name: "JoinTrackArtist");
 
             migrationBuilder.DropTable(
-                name: "Locations");
-
-            migrationBuilder.DropTable(
                 name: "RecentlyTracks");
 
             migrationBuilder.DropTable(
@@ -306,6 +313,9 @@ namespace SynclyServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "TopTracks");
+
+            migrationBuilder.DropTable(
+                name: "UserRegistrations");
 
             migrationBuilder.DropTable(
                 name: "Artists");
@@ -317,10 +327,10 @@ namespace SynclyServer.Migrations
                 name: "Users");
 
             migrationBuilder.DropTable(
-                name: "ServiceLinks");
+                name: "Locations");
 
             migrationBuilder.DropTable(
-                name: "UserRegistrations");
+                name: "ServiceLinks");
         }
     }
 }

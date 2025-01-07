@@ -59,15 +59,15 @@ public class RegistrationRepository(ServerDbContext context) : IRegistrationRepo
             .Where(u => u.Id == id)
             .Select(u => new Registration()
             {
-                Id = u.RegistrationId,
-                AccessToken = u.Registration.AccessToken,
-                ExpiresDate = u.Registration.ExpiresDate,
-                RefreshToken = u.Registration.RefreshToken
+                Id = u.RegistrationId!.Value,
+                AccessToken = u.Registration!.AccessToken,
+                ExpiresDate = u.Registration!.ExpiresDate,
+                RefreshToken = u.Registration!.RefreshToken
             })
             .FirstOrDefaultAsync();
         if (registrationModel is null)
             return null;
-        if ((DateTime.Now - registrationModel.ExpiresDate).TotalSeconds < 10)
+        if ((registrationModel.ExpiresDate - DateTime.Now).TotalSeconds < 10)
         {
             var newAccessToken = await SpotifyApi.SpotifyApi.RefreshTokenAsync(registrationModel.RefreshToken);
             if (newAccessToken is null)

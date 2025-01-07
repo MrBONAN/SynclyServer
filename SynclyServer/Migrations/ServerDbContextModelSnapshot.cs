@@ -81,6 +81,10 @@ namespace SynclyServer.Migrations
 
                     b.HasKey("Id");
 
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
+
                     b.ToTable("UserRegistrations");
                 });
 
@@ -282,7 +286,7 @@ namespace SynclyServer.Migrations
                     b.Property<DateTime>("RecentlyTracksUpdateDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<int>("RegistrationId")
+                    b.Property<int?>("RegistrationId")
                         .HasColumnType("int");
 
                     b.Property<DateTime>("TopItemsUpdateDate")
@@ -292,8 +296,7 @@ namespace SynclyServer.Migrations
 
                     b.HasIndex("LinksId");
 
-                    b.HasIndex("RegistrationId")
-                        .IsUnique();
+                    b.HasIndex("LocationId");
 
                     b.ToTable("Users");
                 });
@@ -305,6 +308,15 @@ namespace SynclyServer.Migrations
                         .HasForeignKey("LinksId");
 
                     b.Navigation("Links");
+                });
+
+            modelBuilder.Entity("SynclyServer.Models.Authorization.Registration", b =>
+                {
+                    b.HasOne("SynclyServer.Models.User", "User")
+                        .WithOne("Registration")
+                        .HasForeignKey("SynclyServer.Models.Authorization.Registration", "UserId");
+
+                    b.Navigation("User");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.JoinTables.RecentlyTracks", b =>
@@ -398,20 +410,13 @@ namespace SynclyServer.Migrations
                         .WithMany()
                         .HasForeignKey("LinksId");
 
-                    b.HasOne("SynclyServer.Models.Authorization.Registration", "Registration")
-                        .WithOne("User")
-                        .HasForeignKey("SynclyServer.Models.User", "RegistrationId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                    b.HasOne("SynclyServer.Models.Location", "Location")
+                        .WithMany()
+                        .HasForeignKey("LocationId");
 
                     b.Navigation("Links");
 
-                    b.Navigation("Registration");
-                });
-
-            modelBuilder.Entity("SynclyServer.Models.Authorization.Registration", b =>
-                {
-                    b.Navigation("User");
+                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.Track", b =>
@@ -422,6 +427,8 @@ namespace SynclyServer.Migrations
             modelBuilder.Entity("SynclyServer.Models.User", b =>
                 {
                     b.Navigation("RecentlyTracks");
+
+                    b.Navigation("Registration");
 
                     b.Navigation("TopArtists");
 

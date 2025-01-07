@@ -50,14 +50,18 @@ public class AuthorizationController(
     private async Task<User> CreateNewAccount(SpotifyAccessTokenDto accessTokenDto, UserProfile userProfile)
     {
         var registrationModel = accessTokenDto.ToRegistration(userProfile.Id!);
-        registrationModel = await RegistrationRepository.CreateAsync(registrationModel);
-        var imageUrl = userProfile.Images!.FirstOrDefault()?.Url!;
-        imageUrl ??= "";
+        var imageUrl = userProfile.Images!.FirstOrDefault()?.Url! ?? "";
         var linksModel = ModelsCreator.CreateLinks(imageUrl, userProfile.ExternalUrls!.Spotify!, userProfile.Id!);
-        linksModel = await LinksRepository.CreateAsync(linksModel);
-        var locationModel = await LocationRepository.CreateAsync(new Location());
-
+        var locationModel = new Location();
+        
         var userModel = ModelsCreator.CreateUser(userProfile, registrationModel, locationModel, linksModel);
+        registrationModel.User = userModel;
+        await LocationRepository.CreateAsync(locationModel);
+        await LinksRepository.CreateAsync(linksModel);
+        await RegistrationRepository.CreateAsync(registrationModel);
+        userModel.Id = 0;
+        registrationModel.UserId = 0;
+        userModel.RegistrationId = registrationModel.Id;
         return await UserRepository.CreateAsync(userModel);
     }
 }

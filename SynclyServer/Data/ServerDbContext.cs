@@ -102,5 +102,10 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
             .HasOne(r => r.User)
             .WithOne(u => u.Registration)
             .HasForeignKey<User>(u => u.RegistrationId);
+        
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Registration)
+            .WithOne(r => r.User)
+            .HasForeignKey<Registration>(r => r.UserId);
     }
 }
