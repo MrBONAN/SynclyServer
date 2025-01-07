@@ -70,10 +70,14 @@ public class TopTrackRepository(
         var topList = topTracks.Data!;
 
         var tracksInDb = await TrackRepository.GetByIdsAsync(topList.Select(t => t.Id)!);
-        var nonexistentTracks = topList.Select(t => t.Id).Except(tracksInDb.Select(t => t.Links!.ExternalId));
+        var nonexistentTracks = topList
+            .Select(t => t.Id)
+            .Except(tracksInDb.Select(t => t.Links!.ExternalId));
+            //.ToList();
         var newTracks = topList
             .Where(t => nonexistentTracks.Contains(t.Id))
             .Select(ModelsCreator.CreateTrack);
+            //.ToList();
         foreach (var trackModel in newTracks)
             tracksInDb.Add(await TrackRepository.CreateAsync(trackModel));
         var tracksInDbByPositionsInTop = tracksInDb

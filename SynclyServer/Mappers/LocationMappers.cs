@@ -16,4 +16,13 @@ public static class LocationMappers
             LastUpdate = locationModel.LastUpdate
         };
     }
+
+    public static Location ToLocationFromUpdate(this UpdateLocationDto locationModel)
+    {
+        return new Location()
+        {
+            Latitude = locationModel.Latitude,
+            Longitude = locationModel.Longitude
+        };
+    }
 }

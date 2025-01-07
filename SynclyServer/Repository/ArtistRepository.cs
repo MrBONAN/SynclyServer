@@ -27,6 +27,7 @@ public class ArtistRepository(ServerDbContext context, ILinksRepository linksRep
     public async Task<List<Artist>> GetByIdsAsync(IEnumerable<string> externalIds)
     {
         return await Context.Artists
+            .Include(a => a.Links)
             .Where(a => a.Links != null && externalIds.Contains(a.Links.ExternalId))
             .ToListAsync();
     }

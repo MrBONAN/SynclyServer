@@ -25,4 +25,17 @@ public class LocationRepository(ServerDbContext context) : ILocationRepository
         await Context.SaveChangesAsync();
         return locationModel;
     }
+
+    public async Task<Location?> UpdateAsync(int userId, Location locationModel)
+    {
+        var user = await Context.Users
+            .Include(u => u.Location)
+            .FirstOrDefaultAsync(u => u.Id == userId);
+        if (user is null)
+            return null;
+        user.Location!.Latitude = locationModel.Latitude;
+        user.Location!.Longitude = locationModel.Longitude;
+        await Context.SaveChangesAsync();
+        return user.Location;
+    }
 }

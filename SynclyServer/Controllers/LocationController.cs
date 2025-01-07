@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using SynclyServer.Dtos.Location;
 using SynclyServer.Interfaces;
 using SynclyServer.Mappers;
 
@@ -25,5 +26,14 @@ public class LocationController(ILocationRepository locationRepository) : Contro
             return NotFound();
         return Ok(locationModel.ToLocationDto());
     }
-    
+
+    [HttpPost("{userId:int}")]
+    public async Task<IActionResult> Update([FromRoute] int userId, [FromBody] UpdateLocationDto updateLocationDto)
+    {
+        var locationModel = updateLocationDto.ToLocationFromUpdate();
+        locationModel = await LocationRepository.UpdateAsync(userId, locationModel);
+        if (locationModel is null)
+            return NotFound();
+        return Ok(locationModel.ToLocationDto());
+    }
 }

@@ -33,6 +33,7 @@ public class TrackRepository(ServerDbContext context, ILinksRepository linksRepo
     public async Task<List<Track>> GetByIdsAsync(IEnumerable<string> externalIds)
     {
         return await Context.Tracks
+            .Include(t => t.Links)
             .Where(t => t.Links != null && externalIds.Contains(t.Links.ExternalId))
             .ToListAsync();
     }
