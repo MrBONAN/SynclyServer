@@ -48,7 +48,7 @@ public static class ModelsCreator
         var trackModel = new Track()
         {
             Name = spotifyTrack.Name!,
-            Genre = null,
+            //Genre = null,
             Links = linksModel
         };
         return trackModel;

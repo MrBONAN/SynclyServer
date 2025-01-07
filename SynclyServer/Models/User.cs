@@ -22,5 +22,6 @@ public class User
     public Links? Links { get; set; }
 
     public DateTime RecentlyTracksUpdateDate { get; set; } = DateTime.MinValue;
-    public DateTime TopItemsUpdateDate { get; set; } = DateTime.MinValue;
+    public DateTime TopTracksUpdateDate { get; set; } = DateTime.MinValue;
+    public DateTime TopArtistsUpdateDate { get; set; } = DateTime.MinValue;
 }

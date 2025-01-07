@@ -28,7 +28,7 @@ public class TopArtistsRepository(
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if ((DateTime.Now - user.TopItemsUpdateDate).TotalDays < 1)
+        if ((DateTime.Now - user.TopArtistsUpdateDate).TotalDays < 1)
             return user.TopArtists.Select(ua => ua.Artist).ToList()!;
         user = await UpdateUserTopArtists(user);
         if (user is null)
@@ -90,7 +90,7 @@ public class TopArtistsRepository(
                 artistsInDbByPositionsInTop.Select(ia => ia.artist.Id),
                 startIndex);
         }
-
+        userModel.TopArtistsUpdateDate = DateTime.Today;
         await Context.SaveChangesAsync();
         return userModel;
     }
