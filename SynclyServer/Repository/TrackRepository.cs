@@ -121,7 +121,7 @@ public class TrackRepository(
                 startIndex);
         }
 
-        userModel.RecentlyTracksUpdateDate = DateTime.Today;
+        userModel.RecentlyTracksUpdateDate = DateTime.Now;
         await Context.SaveChangesAsync();
         return userModel;
     }

@@ -12,7 +12,7 @@ using SynclyServer.Data;
 namespace SynclyServer.Migrations
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20250107201606_init")]
+    [Migration("20250107222539_init")]
     partial class init
     {
         /// <inheritdoc />
