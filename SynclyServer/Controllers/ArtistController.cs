@@ -14,12 +14,12 @@ public class ArtistController(
     private readonly IArtistRepository ArtistRepository = artistRepository;
     private readonly IRegistrationRepository RegistrationRepository = registrationRepository;
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var artists = await ArtistRepository.GetAllAsync();
-        return Ok(artists.Select(a => a.ToArtistDto()));
-    }
+    // [HttpGet]
+    // public async Task<IActionResult> GetAll()
+    // {
+    //     var artists = await ArtistRepository.GetAllAsync();
+    //     return Ok(artists.Select(a => a.ToArtistDto()));
+    // }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)

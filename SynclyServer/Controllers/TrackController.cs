@@ -16,12 +16,12 @@ public class TrackController(
     private readonly ITrackRepository TrackRepository = trackRepository;
     private readonly IRegistrationRepository RegistrationRepository = registrationRepository;
 
-    [HttpGet]
-    public async Task<IActionResult> GetAll()
-    {
-        var tracks = await TrackRepository.GetAllAsync();
-        return Ok(tracks.Select(t => t.ToTrackDto()));
-    }
+    // [HttpGet]
+    // public async Task<IActionResult> GetAll()
+    // {
+    //     var tracks = await TrackRepository.GetAllAsync();
+    //     return Ok(tracks.Select(t => t.ToTrackDto()));
+    // }
 
     [HttpGet("{id:int}")]
     public async Task<IActionResult> GetById([FromRoute] int id)

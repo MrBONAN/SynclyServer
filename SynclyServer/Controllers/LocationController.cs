@@ -18,10 +18,10 @@ public class LocationController(ILocationRepository locationRepository) : Contro
         return Ok(locations.Select(l => l.ToLocationDto()));
     }
 
-    [HttpGet("{id:int}")]
-    public async Task<IActionResult> GetById([FromRoute] int id)
+    [HttpGet("{userId:int}")]
+    public async Task<IActionResult> GetById([FromRoute] int userId)
     {
-        var locationModel = await LocationRepository.GetByIdAsync(id);
+        var locationModel = await LocationRepository.GetByIdAsync(userId);
         if (locationModel is null)
             return NotFound();
         return Ok(locationModel.ToLocationDto());
