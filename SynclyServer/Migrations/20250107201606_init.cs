@@ -27,21 +27,6 @@ namespace SynclyServer.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Locations",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    Latitude = table.Column<decimal>(type: "decimal(9,6)", nullable: true),
-                    Longitude = table.Column<decimal>(type: "decimal(9,6)", nullable: true),
-                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Locations", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "ServiceLinks",
                 columns: table => new
                 {
@@ -114,11 +99,6 @@ namespace SynclyServer.Migrations
                 {
                     table.PrimaryKey("PK_Users", x => x.Id);
                     table.ForeignKey(
-                        name: "FK_Users_Locations_LocationId",
-                        column: x => x.LocationId,
-                        principalTable: "Locations",
-                        principalColumn: "Id");
-                    table.ForeignKey(
                         name: "FK_Users_ServiceLinks_LinksId",
                         column: x => x.LinksId,
                         principalTable: "ServiceLinks",
@@ -147,6 +127,27 @@ namespace SynclyServer.Migrations
                         principalTable: "Tracks",
                         principalColumn: "Id",
                         onDelete: ReferentialAction.Restrict);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Locations",
+                columns: table => new
+                {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
+                    UserId = table.Column<int>(type: "int", nullable: true),
+                    Latitude = table.Column<decimal>(type: "decimal(9,6)", nullable: false),
+                    Longitude = table.Column<decimal>(type: "decimal(9,6)", nullable: false),
+                    LastUpdate = table.Column<DateTime>(type: "datetime2", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Locations", x => x.Id);
+                    table.ForeignKey(
+                        name: "FK_Locations_Users_UserId",
+                        column: x => x.UserId,
+                        principalTable: "Users",
+                        principalColumn: "Id");
                 });
 
             migrationBuilder.CreateTable(
@@ -259,6 +260,13 @@ namespace SynclyServer.Migrations
                 column: "ArtistId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_Locations_UserId",
+                table: "Locations",
+                column: "UserId",
+                unique: true,
+                filter: "[UserId] IS NOT NULL");
+
+            migrationBuilder.CreateIndex(
                 name: "IX_RecentlyTracks_TrackId",
                 table: "RecentlyTracks",
                 column: "TrackId");
@@ -289,11 +297,6 @@ namespace SynclyServer.Migrations
                 name: "IX_Users_LinksId",
                 table: "Users",
                 column: "LinksId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Users_LocationId",
-                table: "Users",
-                column: "LocationId");
         }
 
         /// <inheritdoc />
@@ -304,6 +307,9 @@ namespace SynclyServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "JoinTrackArtist");
+
+            migrationBuilder.DropTable(
+                name: "Locations");
 
             migrationBuilder.DropTable(
                 name: "RecentlyTracks");
@@ -325,9 +331,6 @@ namespace SynclyServer.Migrations
 
             migrationBuilder.DropTable(
                 name: "Users");
-
-            migrationBuilder.DropTable(
-                name: "Locations");
 
             migrationBuilder.DropTable(
                 name: "ServiceLinks");

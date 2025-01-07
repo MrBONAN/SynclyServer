@@ -29,6 +29,7 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
         ConfigureTopArtistsTable(modelBuilder);
         ConfigureRecentlyTracksTable(modelBuilder);
         ConfigureUserRegistrationRelationship(modelBuilder);
+        ConfigureUserLocationRelationship(modelBuilder);
     }
 
     private void ConfigureTrackArtistTable(ModelBuilder modelBuilder)
@@ -107,5 +108,18 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
             .HasOne(u => u.Registration)
             .WithOne(r => r.User)
             .HasForeignKey<Registration>(r => r.UserId);
+    }
+    
+    private void ConfigureUserLocationRelationship(ModelBuilder modelBuilder)
+    {
+        modelBuilder.Entity<Location>()
+            .HasOne(l => l.User)
+            .WithOne(u => u.Location)
+            .HasForeignKey<User>(u => u.LocationId);
+        
+        modelBuilder.Entity<User>()
+            .HasOne(u => u.Location)
+            .WithOne(l => l.User)
+            .HasForeignKey<Location>(l => l.UserId);
     }
 }

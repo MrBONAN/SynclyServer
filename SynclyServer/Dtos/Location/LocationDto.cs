@@ -6,7 +6,7 @@ namespace SynclyServer.Dtos.Location;
 public class LocationDto
 {
     [JsonIgnore] public int Id { get; set; }
-    //public int UserId { get; set; }
+    public int UserId { get; set; }
     [Required]
     [Range(-91, 91)]
     public decimal Latitude { get; set; }

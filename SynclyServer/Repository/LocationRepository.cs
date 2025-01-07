@@ -8,15 +8,19 @@ namespace SynclyServer.Repository;
 public class LocationRepository(ServerDbContext context) : ILocationRepository
 {
     private readonly ServerDbContext Context = context;
-    
+
     public async Task<List<Location>> GetAllAsync()
     {
-        return await Context.Locations.ToListAsync();
+        return await Context.Locations
+            .Include(l => l.User)
+            .ToListAsync();
     }
 
     public async Task<Location?> GetByIdAsync(int id)
     {
-        return await Context.Locations.FindAsync(id);
+        return await Context.Locations
+            .Include(l => l.User)
+            .FirstOrDefaultAsync(l => l.Id == id);
     }
 
     public async Task<Location> CreateAsync(Location locationModel)
@@ -28,14 +32,13 @@ public class LocationRepository(ServerDbContext context) : ILocationRepository
 
     public async Task<Location?> UpdateAsync(int userId, Location locationModel)
     {
-        var user = await Context.Users
-            .Include(u => u.Location)
-            .FirstOrDefaultAsync(u => u.Id == userId);
-        if (user is null)
+        var location = await Context.Locations.FirstOrDefaultAsync(l => l.UserId == userId);
+        if (location is null)
             return null;
-        user.Location!.Latitude = locationModel.Latitude;
-        user.Location!.Longitude = locationModel.Longitude;
+        location.Latitude = location.Latitude;
+        location.Longitude = location.Longitude;
+        location.LastUpdate = DateTime.Now;
         await Context.SaveChangesAsync();
-        return user.Location;
+        return location;
     }
 }

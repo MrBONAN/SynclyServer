@@ -60,8 +60,11 @@ public class AuthorizationController(
         await RegistrationRepository.CreateAsync(registrationModel);
         registrationModel.UserId = 0;
         registrationModel.User = userModel;
+        locationModel.UserId = 0;
+        locationModel.User = userModel;
         userModel.Id = 0;
         userModel.RegistrationId = registrationModel.Id;
+        userModel.LocationId = locationModel.Id;
         return await UserRepository.CreateAsync(userModel);
     }
 }

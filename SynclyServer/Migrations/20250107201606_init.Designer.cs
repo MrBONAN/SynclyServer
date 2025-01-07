@@ -12,7 +12,7 @@ using SynclyServer.Data;
 namespace SynclyServer.Migrations
 {
     [DbContext(typeof(ServerDbContext))]
-    [Migration("20250107142153_init")]
+    [Migration("20250107201606_init")]
     partial class init
     {
         /// <inheritdoc />
@@ -231,13 +231,20 @@ namespace SynclyServer.Migrations
                     b.Property<DateTime>("LastUpdate")
                         .HasColumnType("datetime2");
 
-                    b.Property<decimal?>("Latitude")
+                    b.Property<decimal>("Latitude")
                         .HasColumnType("decimal(9,6)");
 
-                    b.Property<decimal?>("Longitude")
+                    b.Property<decimal>("Longitude")
                         .HasColumnType("decimal(9,6)");
+
+                    b.Property<int?>("UserId")
+                        .HasColumnType("int");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("UserId")
+                        .IsUnique()
+                        .HasFilter("[UserId] IS NOT NULL");
 
                     b.ToTable("Locations");
                 });
@@ -302,8 +309,6 @@ namespace SynclyServer.Migrations
                     b.HasKey("Id");
 
                     b.HasIndex("LinksId");
-
-                    b.HasIndex("LocationId");
 
                     b.ToTable("Users");
                 });
@@ -402,6 +407,15 @@ namespace SynclyServer.Migrations
                     b.Navigation("Track");
                 });
 
+            modelBuilder.Entity("SynclyServer.Models.Location", b =>
+                {
+                    b.HasOne("SynclyServer.Models.User", "User")
+                        .WithOne("Location")
+                        .HasForeignKey("SynclyServer.Models.Location", "UserId");
+
+                    b.Navigation("User");
+                });
+
             modelBuilder.Entity("SynclyServer.Models.Track", b =>
                 {
                     b.HasOne("SynclyServer.Models.Links", "Links")
@@ -417,13 +431,7 @@ namespace SynclyServer.Migrations
                         .WithMany()
                         .HasForeignKey("LinksId");
 
-                    b.HasOne("SynclyServer.Models.Location", "Location")
-                        .WithMany()
-                        .HasForeignKey("LocationId");
-
                     b.Navigation("Links");
-
-                    b.Navigation("Location");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.Track", b =>
@@ -433,6 +441,8 @@ namespace SynclyServer.Migrations
 
             modelBuilder.Entity("SynclyServer.Models.User", b =>
                 {
+                    b.Navigation("Location");
+
                     b.Navigation("RecentlyTracks");
 
                     b.Navigation("Registration");
