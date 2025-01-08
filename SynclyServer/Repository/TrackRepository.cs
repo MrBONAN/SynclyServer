@@ -55,7 +55,7 @@ public class TrackRepository(
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if ((DateTime.Now - user.TopTracksUpdateDate).TotalHours > 2)
+        if ((DateTime.Now - user.RecentlyTracksUpdateDate).TotalHours > 2)
         {
             user = await UpdateUserRecentlyTracks(user);
             if (user is null)
@@ -98,20 +98,24 @@ public class TrackRepository(
         var tracksInDb = await GetByIdsAsync(recentlyTracks.Select(t => t.Id)!);
         var nonexistentTracks = recentlyTracks
             .Select(t => t.Id)
-            .Except(tracksInDb.Select(t => t.Links!.ExternalId));
+            .Except(tracksInDb.Select(t => t.Links!.ExternalId))
+            .ToList();
         var newTracks = recentlyTracks
             .Where(t => nonexistentTracks.Contains(t.Id))
-            .Select(ModelsCreator.CreateTrack);
+            .Select(ModelsCreator.CreateTrack)
+            .ToList();
         foreach (var trackModel in newTracks)
             tracksInDb.Add(await CreateAsync(trackModel));
         var tracksInDbByPositionsInList = tracksInDb
             .Select(track => (recentlyTracks.FindIndex(tl => tl.Id == track.Links!.ExternalId), track))
             .OrderBy(it => it.Item1)
             .ToList();
-
         // Заменяем индексы в текущем списке треков
         foreach (var (recTrack, (_, track)) in userModel.RecentlyTracks.Zip(tracksInDbByPositionsInList))
+        {
+            Context.Entry(recTrack).State = EntityState.Detached;
             recTrack.TrackId = track.Id;
+        }
         // Создаём новые треки в топе
         if (tracksInDb.Count > userModel.RecentlyTracks.Count)
         {

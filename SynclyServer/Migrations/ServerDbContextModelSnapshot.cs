@@ -117,26 +117,38 @@ namespace SynclyServer.Migrations
 
             modelBuilder.Entity("SynclyServer.Models.JoinTables.RecentlyTracks", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Position")
                         .HasColumnType("int");
 
                     b.Property<int>("TrackId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Position")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "TrackId");
+                    b.HasKey("Id");
 
                     b.HasIndex("TrackId");
+
+                    b.HasIndex("UserId", "TrackId")
+                        .IsUnique();
 
                     b.ToTable("RecentlyTracks");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.JoinTables.TopArtists", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ArtistId")
                         .HasColumnType("int");
@@ -144,27 +156,42 @@ namespace SynclyServer.Migrations
                     b.Property<int>("Position")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "ArtistId");
+                    b.Property<int>("UserId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ArtistId");
+
+                    b.HasIndex("UserId", "ArtistId")
+                        .IsUnique();
 
                     b.ToTable("TopArtists");
                 });
 
             modelBuilder.Entity("SynclyServer.Models.JoinTables.TopTracks", b =>
                 {
-                    b.Property<int>("UserId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
+
+                    b.Property<int>("Position")
                         .HasColumnType("int");
 
                     b.Property<int>("TrackId")
                         .HasColumnType("int");
 
-                    b.Property<int>("Position")
+                    b.Property<int>("UserId")
                         .HasColumnType("int");
 
-                    b.HasKey("UserId", "TrackId");
+                    b.HasKey("Id");
 
                     b.HasIndex("TrackId");
+
+                    b.HasIndex("UserId", "TrackId")
+                        .IsUnique();
 
                     b.ToTable("TopTracks");
                 });
@@ -333,7 +360,7 @@ namespace SynclyServer.Migrations
                     b.HasOne("SynclyServer.Models.Track", "Track")
                         .WithMany()
                         .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SynclyServer.Models.User", "User")
@@ -352,7 +379,7 @@ namespace SynclyServer.Migrations
                     b.HasOne("SynclyServer.Models.Artist", "Artist")
                         .WithMany()
                         .HasForeignKey("ArtistId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SynclyServer.Models.User", "User")
@@ -371,7 +398,7 @@ namespace SynclyServer.Migrations
                     b.HasOne("SynclyServer.Models.Track", "Track")
                         .WithMany()
                         .HasForeignKey("TrackId")
-                        .OnDelete(DeleteBehavior.Cascade)
+                        .OnDelete(DeleteBehavior.Restrict)
                         .IsRequired();
 
                     b.HasOne("SynclyServer.Models.User", "User")

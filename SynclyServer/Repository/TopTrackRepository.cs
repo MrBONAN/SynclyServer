@@ -87,7 +87,10 @@ public class TopTrackRepository(
 
         // Заменяем индексы в текущем топе треков
         foreach (var (topTrack, (_, track)) in userModel.TopTracks.Zip(tracksInDbByPositionsInTop))
+        {
+            Context.Entry(topTrack).State = EntityState.Detached;
             topTrack.TrackId = track.Id;
+        }
         // Создаём новые треки в топе
         if (tracksInDb.Count > userModel.TopTracks.Count)
         {
