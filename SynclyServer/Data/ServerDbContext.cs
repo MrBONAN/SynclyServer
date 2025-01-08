@@ -53,49 +53,68 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     private void ConfigureTopTracksTable(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TopTracks>()
-            .HasKey(ut => new { ut.UserId, ut.TrackId });
-        
+            .HasKey(tt => tt.Id);
+
         modelBuilder.Entity<TopTracks>()
-            .HasOne(ut => ut.User)
+            .HasIndex(tt => new { tt.UserId, tt.TrackId })
+            .IsUnique();
+
+        modelBuilder.Entity<TopTracks>()
+            .HasOne(tt => tt.User)
             .WithMany(u => u.TopTracks)
-            .HasForeignKey(ut => ut.UserId)
+            .HasForeignKey(tt => tt.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // modelBuilder.Entity<TopTracks>()
-        //     .HasOne(ut => ut.Track)
-        //     .WithMany()
-        //     .HasForeignKey(ut => ut.TrackId)
-        //     .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<TopTracks>()
+            .HasOne(tt => tt.Track)
+            .WithMany()
+            .HasForeignKey(tt => tt.TrackId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private void ConfigureTopArtistsTable(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TopArtists>()
-            .HasKey(ua => new { ua.UserId, ua.ArtistId});
-        
+            .HasKey(ta => ta.Id);
+
         modelBuilder.Entity<TopArtists>()
-            .HasOne(ut => ut.User)
+            .HasIndex(ta => new { ta.UserId, ta.ArtistId })
+            .IsUnique();
+
+        modelBuilder.Entity<TopArtists>()
+            .HasOne(ta => ta.User)
             .WithMany(u => u.TopArtists)
-            .HasForeignKey(ut => ut.UserId)
+            .HasForeignKey(ta => ta.UserId)
             .OnDelete(DeleteBehavior.Restrict);
 
-        // modelBuilder.Entity<TopArtists>()
-        //     .HasOne(ut => ut.Artist)
-        //     .WithMany()
-        //     .HasForeignKey(ut => ut.ArtistId)
-        //     .OnDelete(DeleteBehavior.Restrict);
+        modelBuilder.Entity<TopArtists>()
+            .HasOne(ta => ta.Artist)
+            .WithMany()
+            .HasForeignKey(ta => ta.ArtistId)
+            .OnDelete(DeleteBehavior.Restrict);
     }
 
     private void ConfigureRecentlyTracksTable(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<RecentlyTracks>()
-            .HasKey(ut => new { ut.UserId, ut.TrackId});
-        
+            .HasKey(rt => rt.Id);
+
         modelBuilder.Entity<RecentlyTracks>()
-            .HasOne(ut => ut.User)
+            .HasIndex(rt => new { rt.UserId, rt.TrackId })
+            .IsUnique();
+
+        modelBuilder.Entity<RecentlyTracks>()
+            .HasOne(rt => rt.User)
             .WithMany(u => u.RecentlyTracks)
-            .HasForeignKey(ut => ut.UserId)
+            .HasForeignKey(rt => rt.UserId)
             .OnDelete(DeleteBehavior.Restrict);
+
+        modelBuilder.Entity<RecentlyTracks>()
+            .HasOne(rt => rt.Track)
+            .WithMany()
+            .HasForeignKey(rt => rt.TrackId)
+            .OnDelete(DeleteBehavior.Restrict);
+
     }
     private void ConfigureUserRegistrationRelationship(ModelBuilder modelBuilder)
     {

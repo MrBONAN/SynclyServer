@@ -5,6 +5,7 @@ namespace SynclyServer.Models.JoinTables;
 [Table("RecentlyTracks")]
 public class RecentlyTracks
 {
+    public int Id { get; set; }
     public int UserId { get; set; }
     public int TrackId { get; set; }
     public User? User { get; set; }

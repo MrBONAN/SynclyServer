@@ -154,19 +154,21 @@ namespace SynclyServer.Migrations
                 name: "RecentlyTracks",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     TrackId = table.Column<int>(type: "int", nullable: false),
                     Position = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_RecentlyTracks", x => new { x.UserId, x.TrackId });
+                    table.PrimaryKey("PK_RecentlyTracks", x => x.Id);
                     table.ForeignKey(
                         name: "FK_RecentlyTracks_Tracks_TrackId",
                         column: x => x.TrackId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_RecentlyTracks_Users_UserId",
                         column: x => x.UserId,
@@ -179,19 +181,21 @@ namespace SynclyServer.Migrations
                 name: "TopArtists",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     ArtistId = table.Column<int>(type: "int", nullable: false),
                     Position = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TopArtists", x => new { x.UserId, x.ArtistId });
+                    table.PrimaryKey("PK_TopArtists", x => x.Id);
                     table.ForeignKey(
                         name: "FK_TopArtists_Artists_ArtistId",
                         column: x => x.ArtistId,
                         principalTable: "Artists",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TopArtists_Users_UserId",
                         column: x => x.UserId,
@@ -204,19 +208,21 @@ namespace SynclyServer.Migrations
                 name: "TopTracks",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     UserId = table.Column<int>(type: "int", nullable: false),
                     TrackId = table.Column<int>(type: "int", nullable: false),
                     Position = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_TopTracks", x => new { x.UserId, x.TrackId });
+                    table.PrimaryKey("PK_TopTracks", x => x.Id);
                     table.ForeignKey(
                         name: "FK_TopTracks_Tracks_TrackId",
                         column: x => x.TrackId,
                         principalTable: "Tracks",
                         principalColumn: "Id",
-                        onDelete: ReferentialAction.Cascade);
+                        onDelete: ReferentialAction.Restrict);
                     table.ForeignKey(
                         name: "FK_TopTracks_Users_UserId",
                         column: x => x.UserId,
@@ -272,14 +278,32 @@ namespace SynclyServer.Migrations
                 column: "TrackId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_RecentlyTracks_UserId_TrackId",
+                table: "RecentlyTracks",
+                columns: new[] { "UserId", "TrackId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TopArtists_ArtistId",
                 table: "TopArtists",
                 column: "ArtistId");
 
             migrationBuilder.CreateIndex(
+                name: "IX_TopArtists_UserId_ArtistId",
+                table: "TopArtists",
+                columns: new[] { "UserId", "ArtistId" },
+                unique: true);
+
+            migrationBuilder.CreateIndex(
                 name: "IX_TopTracks_TrackId",
                 table: "TopTracks",
                 column: "TrackId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_TopTracks_UserId_TrackId",
+                table: "TopTracks",
+                columns: new[] { "UserId", "TrackId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Tracks_LinksId",

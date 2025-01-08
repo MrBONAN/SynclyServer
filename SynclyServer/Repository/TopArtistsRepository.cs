@@ -28,11 +28,12 @@ public class TopArtistsRepository(
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if ((DateTime.Now - user.TopArtistsUpdateDate).TotalDays < 1)
-            return user.TopArtists.Select(ua => ua.Artist).ToList()!;
-        user = await UpdateUserTopArtists(user);
-        if (user is null)
-            return null;
+        if (((DateTime.Now - user.TopArtistsUpdateDate).TotalDays > 1))
+        {
+            user = await UpdateUserTopArtists(user);
+            if (user is null)
+                return null;
+        }
 
         return user.TopArtists.Select(ua => ua.Artist).ToList()!;
     }
@@ -81,7 +82,10 @@ public class TopArtistsRepository(
 
         // Заменяем индексы в текущем топе артистов
         foreach (var (topArtist, (_, artist)) in userModel.TopArtists.Zip(artistsInDbByPositionsInTop))
+        {
+            Context.Entry(topArtist).State = EntityState.Detached;
             topArtist.ArtistId = artist.Id;
+        }
         // Создаём новых авторов в топе
         if (artistsInDb.Count > userModel.TopArtists.Count)
         {
