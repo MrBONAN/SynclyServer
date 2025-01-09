@@ -60,7 +60,8 @@ public class TopArtistsRepository(
     private async Task<User?> UpdateUserTopArtists(User userModel)
     {
         var registrationData = await RegistrationRepository.GetRegistrationDataByUserIdAsync(userModel.Id);
-
+        if (registrationData is null)
+            return null;
         var topArtists =
             await SpotifyApi.SpotifyApi.GetUserTopItemsAsync<SpotifyApi.Models.Artist>(registrationData!.AccessToken,
                 MaxTopArtists);

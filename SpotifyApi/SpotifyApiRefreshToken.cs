@@ -23,6 +23,9 @@ public static partial class SpotifyApi
             Console.WriteLine("Токен успешно обновлён");
             return response.Data.ConvertToAccessTokenDto();
         }
+
+        if (response.Content.Contains("Refresh token revoked"))
+            return new SpotifyAccessTokenDto() {RefreshToken = refreshToken};
     
         Console.WriteLine($"Ошибка при обновлении токена: {response.ErrorMessage ?? response.Content}");
         return null;

@@ -88,7 +88,8 @@ public class TrackRepository(
     private async Task<User?> UpdateUserRecentlyTracks(User userModel)
     {
         var registrationData = await RegistrationRepository.GetRegistrationDataByUserIdAsync(userModel.Id);
-
+        if (registrationData is null)
+            return null;
         var response =
             await SpotifyApi.SpotifyApi.GetRecentlyTracks(registrationData!.AccessToken, MaxRecentlyTracks);
         if (response.Result is not ApiResult.Success)

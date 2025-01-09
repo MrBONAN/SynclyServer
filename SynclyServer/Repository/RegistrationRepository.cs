@@ -72,6 +72,8 @@ public class RegistrationRepository(ServerDbContext context) : IRegistrationRepo
             var newAccessToken = await SpotifyApi.SpotifyApi.RefreshTokenAsync(registrationModel.RefreshToken);
             if (newAccessToken is null)
                 return null;
+            if (newAccessToken.RefreshToken == registrationModel.RefreshToken)
+                return registrationModel;
             return await UpdateAccessToken(registrationModel, newAccessToken);
         }
 

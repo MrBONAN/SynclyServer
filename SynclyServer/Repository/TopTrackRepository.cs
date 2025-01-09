@@ -61,7 +61,8 @@ public class TopTrackRepository(
     private async Task<User?> UpdateUserTopTracks(User userModel)
     {
         var registrationData = await RegistrationRepository.GetRegistrationDataByUserIdAsync(userModel.Id);
-
+        if (registrationData is null)
+            return null;
         var topTracks =
             await SpotifyApi.SpotifyApi.GetUserTopItemsAsync<SpotifyApi.Models.Track>(registrationData!.AccessToken,
                 MaxTopTracks);
