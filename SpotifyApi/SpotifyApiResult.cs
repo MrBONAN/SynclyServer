@@ -15,10 +15,10 @@ public enum ApiResult
     RefreshTokenError,
     
     InvalidCurrentPlayingType,
-    ResponseError,
     
     Forbidden,
+    BadRequest,
+    NotFound,
     
-    
-    Error
+    ResponseError
 }
