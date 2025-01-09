@@ -15,6 +15,7 @@ public static partial class SpotifyApi
         var request = new RestRequest(type);
         request.AddHeader("Authorization", $"Bearer {accessToken}");
         request.AddQueryParameter("limit", limit.ToString());
+        request.AddQueryParameter("time_range", "short_term");
 
         var response = await UserDataClient.ExecuteGetAsync<Paging<T>>(request);
 

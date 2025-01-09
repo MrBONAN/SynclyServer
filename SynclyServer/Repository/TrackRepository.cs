@@ -56,6 +56,11 @@ public class TrackRepository(
             .Include(u => u.RecentlyTracks.OrderBy(ut => ut.Position).Take(MaxRecentlyTracks))
             .ThenInclude(ut => ut.Track)
             .ThenInclude(t => t!.Links)
+            .Include(u => u.RecentlyTracks)
+            .ThenInclude(rt => rt.Track)
+            .ThenInclude(t => t!.TrackArtists)!
+            .ThenInclude(ta => ta.Artist)
+            .ThenInclude(a => a!.Links)
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
