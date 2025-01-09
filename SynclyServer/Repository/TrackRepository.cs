@@ -92,7 +92,7 @@ public class TrackRepository(
             return null;
         var response =
             await SpotifyApi.SpotifyApi.GetRecentlyTracks(registrationData!.AccessToken, MaxRecentlyTracks);
-        if (response.Result is not ApiResult.Success)
+        if (response.Result is not ApiResult.Ok)
             return null;
         var recentlyTracks = response.Data!;
 

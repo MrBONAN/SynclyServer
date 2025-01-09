@@ -1,4 +1,5 @@
 using RestSharp;
+using SpotifyApi.ManageApiResult;
 using SpotifyApi.Models;
 
 namespace SpotifyApi;
@@ -12,11 +13,14 @@ public static partial class SpotifyApi
 
         var response = await UserProfileClient.ExecuteGetAsync<PlaybackState>(request);
 
-        if (response.IsSuccessful && response.Data != null && response.Data.CurrentlyPlayingType == "track")
+        if (response.IsSuccessful && response.Data != null)
         {
-            return new SpotifyApiResult<Track, PlaybackState>(ApiResult.Success, response.Data.Item!, response);
+            if (response.Data.CurrentlyPlayingType == "track")
+                return new (ApiResult.Ok, response.Data.Item!, response);
+            return new(ApiResult.InvalidCurrentPlayingType, null, response);
         }
-        
-        return new SpotifyApiResult<Track, PlaybackState>(ApiResult.Error, null, response);
+
+        var apiResult = ResultManager.ManageResponseResult(response);
+        return new (apiResult, null, response);
     }
 }

@@ -1,4 +1,5 @@
 using RestSharp;
+using SpotifyApi.ManageApiResult;
 using SpotifyApi.Models;
 
 namespace SpotifyApi;
@@ -15,8 +16,8 @@ public static partial class SpotifyApi
         var response = await UserProfileClient.ExecuteGetAsync<UserProfile>(request);
 
         if (response.IsSuccessful && response.Data != null)
-            return new SpotifyApiResult<UserProfile>(ApiResult.Success, response.Data, response);
-
-        return new SpotifyApiResult<UserProfile>(ApiResult.Error, null, response);
+            return new(ApiResult.Ok, response.Data, response);
+        var apiResult = ResultManager.ManageResponseResult(response);
+        return new(apiResult, null, response);
     }
 }

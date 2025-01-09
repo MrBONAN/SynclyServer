@@ -65,7 +65,7 @@ public class TopArtistsRepository(
         var topArtists =
             await SpotifyApi.SpotifyApi.GetUserTopItemsAsync<SpotifyApi.Models.Artist>(registrationData!.AccessToken,
                 MaxTopArtists);
-        if (topArtists.Result is not ApiResult.Success)
+        if (topArtists.Result is not ApiResult.Ok)
             return null;
         var topList = topArtists.Data!;
 

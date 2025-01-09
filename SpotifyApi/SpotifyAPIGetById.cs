@@ -1,4 +1,5 @@
 using RestSharp;
+using SpotifyApi.ManageApiResult;
 using SpotifyApi.Models;
 
 namespace SpotifyApi;
@@ -13,9 +14,10 @@ public static partial class SpotifyApi
         var response = await UserProfileClient.ExecuteGetAsync<T>(request);
 
         if (response.IsSuccessful && response.Data != null)
-            return new SpotifyApiResult<T>(ApiResult.Success, response.Data, response);
-
-        return new SpotifyApiResult<T>(ApiResult.Error, null, response);
+            return new (ApiResult.Ok, response.Data, response);
+        
+        var apiResult = ResultManager.ManageResponseResult(response);
+        return new (apiResult, null, response);
     }
 
     public static async Task<SpotifyApiResult<List<T>, TracksAndArtistsList<T>>> GetSeveralEntitiesById<T>(
@@ -29,9 +31,9 @@ public static partial class SpotifyApi
         var response = await SpotifyApi.SpotifyClient.ExecuteGetAsync<TracksAndArtistsList<T>>(request);
 
         if (response.IsSuccessful && response.Data != null)
-            return new SpotifyApiResult<List<T>, TracksAndArtistsList<T>>(ApiResult.Success,
-                response.Data.Tracks ?? response.Data.Artists, response);
-
-        return new SpotifyApiResult<List<T>, TracksAndArtistsList<T>>(ApiResult.Error, null, response);
+            return new (ApiResult.Ok, response.Data.Tracks ?? response.Data.Artists, response);
+        
+        var apiResult = ResultManager.ManageResponseResult(response);
+        return new (apiResult, null, response);
     }
 }

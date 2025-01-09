@@ -7,6 +7,18 @@ public record SpotifyApiResult<T, T2>(ApiResult Result, T? Data, RestResponse<T2
 
 public enum ApiResult
 {
-    Success,
+    Ok,
+    
+    DataIsNull,
+    
+    RefreshTokenStillValid,
+    RefreshTokenError,
+    
+    InvalidCurrentPlayingType,
+    ResponseError,
+    
+    Forbidden,
+    
+    
     Error
 }

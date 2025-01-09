@@ -66,7 +66,7 @@ public class TopTrackRepository(
         var topTracks =
             await SpotifyApi.SpotifyApi.GetUserTopItemsAsync<SpotifyApi.Models.Track>(registrationData!.AccessToken,
                 MaxTopTracks);
-        if (topTracks.Result is not ApiResult.Success)
+        if (topTracks.Result is not ApiResult.Ok)
             return null;
         var topList = topTracks.Data!;
 
