@@ -55,7 +55,7 @@ public class TrackRepository(
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if ((DateTime.Now - user.RecentlyTracksUpdateDate).TotalHours > 2)
+        if ((DateTime.UtcNow - user.RecentlyTracksUpdateDate).TotalHours > 2)
         {
             user = await UpdateUserRecentlyTracks(user);
             if (user is null)
@@ -126,7 +126,7 @@ public class TrackRepository(
                 startIndex);
         }
 
-        userModel.RecentlyTracksUpdateDate = DateTime.Now;
+        userModel.RecentlyTracksUpdateDate = DateTime.UtcNow;
         await Context.SaveChangesAsync();
         return userModel;
     }

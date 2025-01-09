@@ -28,7 +28,7 @@ public class TopTrackRepository(
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if ((DateTime.Now - user.TopTracksUpdateDate).TotalDays > 1)
+        if ((DateTime.UtcNow - user.TopTracksUpdateDate).TotalDays > 1)
         {
             user = await UpdateUserTopTracks(user);
             if (user is null)
