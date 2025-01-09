@@ -30,6 +30,10 @@ namespace SynclyServer.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
+                    b.Property<string>("GenresJson")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<int?>("LinksId")
                         .HasColumnType("int");
 
@@ -198,15 +202,24 @@ namespace SynclyServer.Migrations
 
             modelBuilder.Entity("SynclyServer.Models.JoinTables.TrackArtist", b =>
                 {
-                    b.Property<int>("TrackId")
+                    b.Property<int>("Id")
+                        .ValueGeneratedOnAdd()
                         .HasColumnType("int");
+
+                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
 
                     b.Property<int>("ArtistId")
                         .HasColumnType("int");
 
-                    b.HasKey("TrackId", "ArtistId");
+                    b.Property<int>("TrackId")
+                        .HasColumnType("int");
+
+                    b.HasKey("Id");
 
                     b.HasIndex("ArtistId");
+
+                    b.HasIndex("TrackId", "ArtistId")
+                        .IsUnique();
 
                     b.ToTable("JoinTrackArtist");
                 });
@@ -303,9 +316,6 @@ namespace SynclyServer.Migrations
                         .HasColumnType("int");
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<int?>("CurrentTrackId")
-                        .HasColumnType("int");
 
                     b.Property<int?>("LinksId")
                         .HasColumnType("int");

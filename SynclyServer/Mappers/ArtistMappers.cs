@@ -1,3 +1,4 @@
+using Newtonsoft.Json;
 using SynclyServer.Dtos.Artist;
 using SynclyServer.Models;
 
@@ -12,6 +13,7 @@ public static class ArtistMappers
             Id = artisModel.Id,
             Name = artisModel.Name,
             //Tracks = artisModel.Tracks.Select(t => t.ToTrackDto()).ToList(),
+            Genres = JsonConvert.DeserializeObject<List<string>>(artisModel.GenresJson)!,
             LinksId = artisModel.LinksId!.Value,
             Links = artisModel.Links!.ToLinksDto()
         };

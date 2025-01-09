@@ -11,7 +11,7 @@ public static class UserMappers
         {
             Id = userModel.Id,
             Name = userModel.Name,
-            CurrentTrackId = userModel.CurrentTrackId,
+            //CurrentTrackId = userModel.CurrentTrackId,
             LocationId = userModel.LocationId,
             LinksId = userModel.LinksId!.Value,
             Links = userModel.Links!.ToLinksDto(),

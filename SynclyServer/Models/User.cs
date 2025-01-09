@@ -12,7 +12,7 @@ public class User
     public int? RegistrationId { get; set; }
     public Registration? Registration { get; set; } = null!;
     [MaxLength(50)] public string Name { get; set; } = string.Empty;
-    public int? CurrentTrackId { get; set; }
+    //public int? CurrentTrackId { get; set; }
     public List<TopTracks> TopTracks { get; set; } = new();
     public List<TopArtists> TopArtists { get; set; } = new();
     public List<RecentlyTracks> RecentlyTracks { get; set; } = new();

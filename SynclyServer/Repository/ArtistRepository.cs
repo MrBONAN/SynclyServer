@@ -34,11 +34,21 @@ public class ArtistRepository(ServerDbContext context, ILinksRepository linksRep
 
     public async Task<Artist> CreateAsync(Artist artistModel)
     {
+        var existedModel = await FindByExternalId(artistModel.Links!.ExternalId);
+        if (existedModel is not null)
+            return existedModel;
         var linksModel = await LinksRepository.CreateAsync(artistModel.Links!);
         artistModel.LinksId = linksModel.Id;
         artistModel.Links = linksModel;
         await Context.Artists.AddAsync(artistModel);
         await Context.SaveChangesAsync();
         return artistModel;
+    }
+
+    private async Task<Artist?> FindByExternalId(string externalId)
+    {
+        return await Context.Artists
+            .Include(a => a.Links)
+            .FirstOrDefaultAsync(a => a.Links!.ExternalId == externalId);
     }
 }

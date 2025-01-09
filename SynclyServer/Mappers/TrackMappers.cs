@@ -11,8 +11,7 @@ public static class TrackMappers
         {
             Id = trackModel.Id,
             Name = trackModel.Name,
-            Artists = trackModel.TrackArtists?.Select(ta => ta.Artist!.ToArtistDto()).ToList(),
-            //Genre = trackModel.Genre,
+            Artists = trackModel.TrackArtists?.Select(ta => ta.Artist!.ToArtistDto()).ToList() ?? new(),
             LinksId = trackModel.LinksId!.Value,
             Links = trackModel.Links!.ToLinksDto()
         };

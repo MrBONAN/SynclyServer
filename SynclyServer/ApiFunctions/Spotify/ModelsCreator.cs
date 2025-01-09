@@ -1,6 +1,8 @@
+using System.Text.Json;
 using SpotifyApi.Models;
 using SynclyServer.Models;
 using SynclyServer.Models.Authorization;
+using SynclyServer.Models.JoinTables;
 using SynclyServer.Repository;
 using Artist = SynclyServer.Models.Artist;
 using Track = SynclyServer.Models.Track;
@@ -9,9 +11,10 @@ namespace SynclyServer.Mappers;
 
 public static class ModelsCreator
 {
-    public static User CreateUser(UserProfile userProfile, Registration registrationModel, Location locationModel, Links linksModel)
+    public static User CreateUser(UserProfile userProfile, Registration registrationModel, Location locationModel,
+        Links linksModel)
     {
-        return new User() 
+        return new User()
         {
             Registration = registrationModel,
             Name = userProfile.DisplayName!,
@@ -53,7 +56,7 @@ public static class ModelsCreator
         };
         return trackModel;
     }
-    
+
     public static Artist CreateArtist(SpotifyApi.Models.Artist spotifyArtist)
     {
         var imageUrl = spotifyArtist.Images!.FirstOrDefault()?.Url!;
@@ -68,8 +71,32 @@ public static class ModelsCreator
         var artistModel = new Artist()
         {
             Name = spotifyArtist.Name!,
+            GenresJson = JsonSerializer.Serialize(spotifyArtist.Genres),
             Links = linksModel
         };
         return artistModel;
+    }
+
+    public static (Track, List<Artist>) CreateTrackWithArtists(SpotifyApi.Models.Track spotifyTrack)
+    {
+        var track = CreateTrack(spotifyTrack);
+        var artists = spotifyTrack.Artists!.Select(CreateArtist).ToList();
+        return (track, artists);
+    }
+    
+    public static List<(Track, List<Artist>)> CreateSeveralTracksWithArtists(IEnumerable<SpotifyApi.Models.Track> spotifyTracks)
+    {
+        return spotifyTracks.Select(CreateTrackWithArtists).ToList();
+    }
+
+    public static TrackArtist CreateTrackArtist(Track track, Artist artist)
+    {
+        return new TrackArtist()
+        {
+            TrackId = track.Id,
+            Track = track,
+            ArtistId = artist.Id,
+            Artist = artist
+        };
     }
 }

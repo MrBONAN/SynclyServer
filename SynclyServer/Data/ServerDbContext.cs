@@ -35,7 +35,11 @@ public class ServerDbContext(DbContextOptions dbContextOptions) : DbContext(dbCo
     private void ConfigureTrackArtistTable(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<TrackArtist>()
-            .HasKey(ta => new { ta.TrackId, ta.ArtistId });
+            .HasKey(ta => ta.Id);
+        
+        modelBuilder.Entity<TrackArtist>()
+            .HasIndex(ta => new { ta.TrackId, ta.ArtistId })
+            .IsUnique();
 
         modelBuilder.Entity<TrackArtist>()
             .HasOne(ta => ta.Track)

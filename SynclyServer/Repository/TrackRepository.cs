@@ -11,11 +11,15 @@ namespace SynclyServer.Repository;
 public class TrackRepository(
     ServerDbContext context,
     ILinksRepository linksRepository,
-    IRegistrationRepository registrationRepository) : ITrackRepository
+    IRegistrationRepository registrationRepository,
+    IArtistRepository artistRepository,
+    ITrackArtistRepository trackArtistRepository) : ITrackRepository
 {
     private readonly ServerDbContext Context = context;
     private readonly ILinksRepository LinksRepository = linksRepository;
     private readonly IRegistrationRepository RegistrationRepository = registrationRepository;
+    private readonly IArtistRepository ArtistRepository = artistRepository;
+    private readonly ITrackArtistRepository TrackArtistRepository = trackArtistRepository;
     private const int MaxRecentlyTracks = 10;
 
     public async Task<List<Track>> GetAllAsync()
@@ -101,12 +105,19 @@ public class TrackRepository(
             .Select(t => t.Id)
             .Except(tracksInDb.Select(t => t.Links!.ExternalId))
             .ToList();
-        var newTracks = recentlyTracks
-            .Where(t => nonexistentTracks.Contains(t.Id))
-            .Select(ModelsCreator.CreateTrack)
+
+        var newTrackIds = recentlyTracks
+            .Select(t => t.Id)
+            .Where(tId => nonexistentTracks.Contains(tId))
             .ToList();
-        foreach (var trackModel in newTracks)
-            tracksInDb.Add(await CreateAsync(trackModel));
+        if (newTrackIds.Count > 0)
+        {
+            var addedTracks = await CreateTracksWithArtistsAsync(userModel.Id, newTrackIds!);
+            if (addedTracks is null)
+                return null;
+            tracksInDb.AddRange(addedTracks);
+        }
+
         var tracksInDbByPositionsInList = tracksInDb
             .Select(track => (recentlyTracks.FindIndex(tl => tl.Id == track.Links!.ExternalId), track))
             .OrderBy(it => it.Item1)
@@ -117,6 +128,7 @@ public class TrackRepository(
             Context.Entry(recTrack).State = EntityState.Detached;
             recTrack.TrackId = track.Id;
         }
+
         // Создаём новые треки в топе
         if (tracksInDb.Count > userModel.RecentlyTracks.Count)
         {
@@ -133,11 +145,68 @@ public class TrackRepository(
 
     public async Task<Track> CreateAsync(Track trackModel)
     {
+        var existedModel = await FindByExternalId(trackModel.Links!.ExternalId);
+        if (existedModel is not null)
+            return existedModel;
         var linksModel = await LinksRepository.CreateAsync(trackModel.Links!);
         trackModel.LinksId = linksModel.Id;
         trackModel.Links = linksModel;
         await Context.Tracks.AddAsync(trackModel);
         await Context.SaveChangesAsync();
         return trackModel;
+    }
+
+    private async Task<Track?> FindByExternalId(string externalId)
+    {
+        return await Context.Tracks
+            .Include(t => t.Links)
+            .FirstOrDefaultAsync(t => t.Links!.ExternalId == externalId);
+    }
+
+    public async Task<List<Track>?> CreateTracksWithArtistsAsync(int userId, IEnumerable<string> newTrackIds)
+    {
+        var tracksInDb = new List<Track>();
+        var newTracks = await CreateSeveralTracksBySpotifyIdAsync(userId, newTrackIds!);
+        if (newTracks is null)
+            return null;
+        var newTracksInDb = new List<(Track, List<Artist>)>();
+        foreach (var (trackModel, artistModels) in newTracks)
+        {
+            tracksInDb.Add(await CreateAsync(trackModel));
+            var artists = new List<Artist>();
+            foreach (var artistModel in artistModels)
+                artists.Add(await ArtistRepository.CreateAsync(artistModel));
+
+            newTracksInDb.Add((trackModel, artists));
+        }
+
+        await TrackArtistRepository.CreateSeveralTrackArtistsAsync(newTracksInDb);
+        return tracksInDb;
+    }
+
+    public async Task<(Track, List<Artist>)?> CreateTrackBySpotifyIdAsync(int userId, string spotifyId)
+    {
+        var registrationData = await RegistrationRepository.GetRegistrationDataByUserIdAsync(userId);
+        if (registrationData is null)
+            return null;
+        var fullTrackInfoResult =
+            await SpotifyApi.SpotifyApi.GetTrackByIdWithFullArtistsInfoAsync(registrationData.AccessToken, spotifyId);
+        if (fullTrackInfoResult.Result is not ApiResult.Ok)
+            return null;
+        return ModelsCreator.CreateTrackWithArtists(fullTrackInfoResult.Data!);
+    }
+
+    public async Task<List<(Track, List<Artist>)>?> CreateSeveralTracksBySpotifyIdAsync(int userId,
+        IEnumerable<string> spotifyIds)
+    {
+        var registrationData = await RegistrationRepository.GetRegistrationDataByUserIdAsync(userId);
+        if (registrationData is null)
+            return null;
+        var fullTrackInfoResult =
+            await SpotifyApi.SpotifyApi.GetSeveralTrackByIdsWithFullArtistsInfoAsync(registrationData.AccessToken,
+                spotifyIds);
+        if (fullTrackInfoResult.Result is not ApiResult.Ok)
+            return null;
+        return ModelsCreator.CreateSeveralTracksWithArtists(fullTrackInfoResult.Data!);
     }
 }
