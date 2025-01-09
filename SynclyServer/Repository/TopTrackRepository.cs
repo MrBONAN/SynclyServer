@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using SpotifyApi;
 using SynclyServer.Data;
 using SynclyServer.Interfaces;
-using SynclyServer.Mappers;
 using SynclyServer.Models;
 using SynclyServer.Models.JoinTables;
 
@@ -28,6 +27,11 @@ public class TopTrackRepository(
             .Include(u => u.TopTracks.OrderBy(ua => ua.Position).Take(MaxTopTracks))
             .ThenInclude(ut => ut.Track)
             .ThenInclude(t => t!.Links)
+            .Include(u => u.TopTracks)
+            .ThenInclude(ut => ut.Track)
+            .ThenInclude(t => t!.TrackArtists)!
+            .ThenInclude(ta => ta.Artist)
+            .ThenInclude(a => a!.Links)
             .Include(u => u.Registration)
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)

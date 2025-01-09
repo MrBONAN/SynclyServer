@@ -28,7 +28,7 @@ public class TopArtistsRepository(
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if (((DateTime.UtcNow - user.TopArtistsUpdateDate).TotalDays > 1))
+        if ((DateTime.UtcNow - user.TopArtistsUpdateDate).TotalDays > 1)
         {
             user = await UpdateUserTopArtists(user);
             if (user is null)
