@@ -11,5 +11,5 @@ public class RecentlyTracks
     public User? User { get; set; }
     public Track? Track { get; set; }
     public int Position { get; set; }
-    //public DateTime UpdateTime { get; set; } = DateTime.Now;
+    //public DateTime UpdateTime { get; set; } = DateTime.UtcNow;
 }

@@ -37,7 +37,7 @@ public class LocationRepository(ServerDbContext context) : ILocationRepository
             return null;
         location.Latitude = locationModel.Latitude;
         location.Longitude = locationModel.Longitude;
-        location.LastUpdate = DateTime.Now;
+        location.LastUpdate = DateTime.UtcNow;
         await Context.SaveChangesAsync();
         return location;
     }

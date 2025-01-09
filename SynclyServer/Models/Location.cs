@@ -10,5 +10,5 @@ public class Location
     public User? User { get; set; }
     [Column(TypeName = "decimal(9,6)")] public decimal Latitude { get; set; }
     [Column(TypeName = "decimal(9,6)")] public decimal Longitude { get; set; }
-    public DateTime LastUpdate { get; set; } = DateTime.Now;
+    public DateTime LastUpdate { get; set; } = DateTime.UtcNow;
 }

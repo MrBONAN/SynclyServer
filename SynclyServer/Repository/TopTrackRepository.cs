@@ -2,7 +2,6 @@ using Microsoft.EntityFrameworkCore;
 using SpotifyApi;
 using SynclyServer.Data;
 using SynclyServer.Interfaces;
-using SynclyServer.Mappers;
 using SynclyServer.Models;
 using SynclyServer.Models.JoinTables;
 
@@ -11,11 +10,15 @@ namespace SynclyServer.Repository;
 public class TopTrackRepository(
     ServerDbContext context,
     IRegistrationRepository registrationRepository,
-    ITrackRepository trackRepository) : ITopTracksRepository
+    ITrackRepository trackRepository,
+    IArtistRepository artistRepository,
+    ITrackArtistRepository trackArtistRepository) : ITopTracksRepository
 {
     private readonly ServerDbContext Context = context;
     private readonly IRegistrationRepository RegistrationRepository = registrationRepository;
     private readonly ITrackRepository TrackRepository = trackRepository;
+    private readonly IArtistRepository ArtistRepository = artistRepository;
+    private readonly ITrackArtistRepository TrackArtistRepository = trackArtistRepository;
     private const int MaxTopTracks = 10;
 
     public async Task<List<Track>?> GetTopTracksAsync(int userId)
@@ -24,11 +27,16 @@ public class TopTrackRepository(
             .Include(u => u.TopTracks.OrderBy(ua => ua.Position).Take(MaxTopTracks))
             .ThenInclude(ut => ut.Track)
             .ThenInclude(t => t!.Links)
+            .Include(u => u.TopTracks)
+            .ThenInclude(ut => ut.Track)
+            .ThenInclude(t => t!.TrackArtists)!
+            .ThenInclude(ta => ta.Artist)
+            .ThenInclude(a => a!.Links)
             .Include(u => u.Registration)
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if ((DateTime.Now - user.TopTracksUpdateDate).TotalDays > 1)
+        if ((DateTime.UtcNow - user.TopTracksUpdateDate).TotalDays > 1)
         {
             user = await UpdateUserTopTracks(user);
             if (user is null)
@@ -50,7 +58,7 @@ public class TopTrackRepository(
                 TrackId = trackId,
                 Position = startIndex++
             };
-            Context.TopTracks.Add(topTrack);
+            await Context.TopTracks.AddAsync(topTrack);
             topTracks.Add(topTrack);
         }
 
@@ -61,11 +69,12 @@ public class TopTrackRepository(
     private async Task<User?> UpdateUserTopTracks(User userModel)
     {
         var registrationData = await RegistrationRepository.GetRegistrationDataByUserIdAsync(userModel.Id);
-
+        if (registrationData is null)
+            return null;
         var topTracks =
             await SpotifyApi.SpotifyApi.GetUserTopItemsAsync<SpotifyApi.Models.Track>(registrationData!.AccessToken,
                 MaxTopTracks);
-        if (topTracks.Result is not ApiResult.Success)
+        if (topTracks.Result is not ApiResult.Ok)
             return null;
         var topList = topTracks.Data!;
 
@@ -73,13 +82,19 @@ public class TopTrackRepository(
         var nonexistentTracks = topList
             .Select(t => t.Id)
             .Except(tracksInDb.Select(t => t.Links!.ExternalId));
-            //.ToList();
-        var newTracks = topList
-            .Where(t => nonexistentTracks.Contains(t.Id))
-            .Select(ModelsCreator.CreateTrack);
-            //.ToList();
-        foreach (var trackModel in newTracks)
-            tracksInDb.Add(await TrackRepository.CreateAsync(trackModel));
+        
+        var newTrackIds = topList
+            .Select(t => t.Id)
+            .Where(tId => nonexistentTracks.Contains(tId))
+            .ToList();
+        if (newTrackIds.Count > 0)
+        {
+            var addedTracks = await TrackRepository.CreateTracksWithArtistsAsync(userModel.Id, newTrackIds!);
+            if (addedTracks is null)
+                return null;
+            tracksInDb.AddRange(addedTracks);
+        }
+
         var tracksInDbByPositionsInTop = tracksInDb
             .Select(track => (topList.FindIndex(tl => tl.Id == track.Links!.ExternalId), track))
             .OrderBy(it => it.Item1)
@@ -91,6 +106,7 @@ public class TopTrackRepository(
             Context.Entry(topTrack).State = EntityState.Detached;
             topTrack.TrackId = track.Id;
         }
+
         // Создаём новые треки в топе
         if (tracksInDb.Count > userModel.TopTracks.Count)
         {
@@ -99,6 +115,7 @@ public class TopTrackRepository(
                 tracksInDbByPositionsInTop.Select(it => it.track.Id),
                 startIndex);
         }
+
         userModel.TopTracksUpdateDate = DateTime.Today;
         await Context.SaveChangesAsync();
         return userModel;

@@ -1,4 +1,5 @@
 using RestSharp;
+using SpotifyApi.ManageApiResult;
 using SpotifyApi.Models;
 
 namespace SpotifyApi;
@@ -13,9 +14,10 @@ public static partial class SpotifyApi
         var response = await UserProfileClient.ExecuteGetAsync<T>(request);
 
         if (response.IsSuccessful && response.Data != null)
-            return new SpotifyApiResult<T>(ApiResult.Success, response.Data, response);
+            return new(ApiResult.Ok, response.Data, response);
 
-        return new SpotifyApiResult<T>(ApiResult.Error, null, response);
+        var apiResult = ResultManager.ManageResponseResult(response);
+        return new(apiResult, null, response);
     }
 
     public static async Task<SpotifyApiResult<List<T>, TracksAndArtistsList<T>>> GetSeveralEntitiesById<T>(
@@ -29,9 +31,53 @@ public static partial class SpotifyApi
         var response = await SpotifyApi.SpotifyClient.ExecuteGetAsync<TracksAndArtistsList<T>>(request);
 
         if (response.IsSuccessful && response.Data != null)
-            return new SpotifyApiResult<List<T>, TracksAndArtistsList<T>>(ApiResult.Success,
-                response.Data.Tracks ?? response.Data.Artists, response);
+            return new(ApiResult.Ok, response.Data.Tracks ?? response.Data.Artists, response);
 
-        return new SpotifyApiResult<List<T>, TracksAndArtistsList<T>>(ApiResult.Error, null, response);
+        var apiResult = ResultManager.ManageResponseResult(response);
+        return new(apiResult, null, response);
+    }
+
+    public static async Task<SpotifyApiResult<Track>> GetTrackByIdWithFullArtistsInfoAsync(string accessToken,
+        string trackId)
+    {
+        var trackResponse = await GetEntityByIdAsync<Track>(accessToken, trackId);
+        if (trackResponse.Result is not ApiResult.Ok)
+            return new(trackResponse.Result, null, null);
+        var trackData = trackResponse.Data!;
+        var artistsIds = trackData.Artists!.Select(a => a.Id);
+        var artistsResponse = await GetSeveralEntitiesById<Artist>(accessToken, artistsIds!);
+        if (artistsResponse.Result is not ApiResult.Ok)
+            return new(artistsResponse.Result, null, null);
+        trackData.Artists = artistsResponse.Data;
+        return new(ApiResult.Ok, trackData, null);
+    }
+
+    public static async Task<SpotifyApiResult<List<Track>>> GetSeveralTrackByIdsWithFullArtistsInfoAsync(
+        string accessToken,
+        IEnumerable<string> trackIds)
+    {
+        var tracksResponse = await GetSeveralEntitiesById<Track>(accessToken, trackIds);
+        if (tracksResponse.Result is not ApiResult.Ok)
+            return new(tracksResponse.Result, null, null);
+        var tracksData = tracksResponse.Data!;
+        var artistsMapper = tracksData
+            .SelectMany((t, i) => t.Artists!.Select(a => (artistId: a.Id!, trackIndex: i)))
+            .ToLookup(tuple => tuple.artistId);
+        var artistsIds = tracksData.SelectMany(t => t.Artists!.Select(a => a.Id));
+        var artistsResponse = await GetSeveralEntitiesById<Artist>(accessToken, artistsIds!);
+        if (artistsResponse.Result is not ApiResult.Ok)
+            return new(artistsResponse.Result, null, null);
+        foreach (var track in tracksData)
+            track.Artists!.Clear();
+        var alreadyWas = new HashSet<string>();
+        foreach (var artistModel in artistsResponse.Data!)
+        {
+            if (alreadyWas.Contains(artistModel.Id!)) continue;
+            alreadyWas.Add(artistModel.Id!);
+            foreach(var tuple in artistsMapper[artistModel.Id!])
+                tracksData[tuple.trackIndex].Artists!.Add(artistModel);
+        }
+
+        return new(ApiResult.Ok, tracksData, null);
     }
 }

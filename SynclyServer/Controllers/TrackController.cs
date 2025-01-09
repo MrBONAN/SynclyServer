@@ -39,7 +39,7 @@ public class TrackController(
         if (registration is null)
             return NotFound();
         var response = await SpotifyApi.SpotifyApi.GetCurrentTrackAsync(registration.AccessToken);
-        if (response.Result is not ApiResult.Success)
+        if (response.Result is not ApiResult.Ok)
             return NotFound();
         var track = ModelsCreator.CreateTrack(response.Data!);
         track.LinksId = 0;

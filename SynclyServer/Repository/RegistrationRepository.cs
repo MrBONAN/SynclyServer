@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using SpotifyApi;
 using SpotifyApi.Models.Authorization;
 using SynclyServer.Data;
 using SynclyServer.Interfaces;
@@ -67,12 +68,15 @@ public class RegistrationRepository(ServerDbContext context) : IRegistrationRepo
             .FirstOrDefaultAsync();
         if (registrationModel is null)
             return null;
-        if ((registrationModel.ExpiresDate - DateTime.Now).TotalSeconds < 10)
+        if ((registrationModel.ExpiresDate - DateTime.UtcNow).TotalSeconds < 10)
         {
-            var newAccessToken = await SpotifyApi.SpotifyApi.RefreshTokenAsync(registrationModel.RefreshToken);
-            if (newAccessToken is null)
-                return null;
-            return await UpdateAccessToken(registrationModel, newAccessToken);
+            var refreshResult = await SpotifyApi.SpotifyApi.RefreshTokenAsync(registrationModel.RefreshToken);
+            return refreshResult.Result switch
+            {
+                ApiResult.RefreshTokenStillValid => registrationModel,
+                ApiResult.Ok => await UpdateAccessToken(registrationModel, refreshResult.Data!),
+                _ => null
+            };
         }
 
         return registrationModel;
@@ -81,6 +85,7 @@ public class RegistrationRepository(ServerDbContext context) : IRegistrationRepo
     private async Task<Registration> UpdateAccessToken(Registration registrationModel,
         SpotifyAccessTokenDto newAccessToken)
     {
+        var expiresDate = newAccessToken.ExpiresDate;
         registrationModel.AccessToken = newAccessToken.AccessToken;
         registrationModel.RefreshToken = newAccessToken.RefreshToken;
         registrationModel.ExpiresDate = newAccessToken.ExpiresDate;

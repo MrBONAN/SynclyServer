@@ -49,6 +49,7 @@ namespace SynclyServer.Migrations
                     Id = table.Column<int>(type: "int", nullable: false)
                         .Annotation("SqlServer:Identity", "1, 1"),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    GenresJson = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     LinksId = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
@@ -88,7 +89,6 @@ namespace SynclyServer.Migrations
                         .Annotation("SqlServer:Identity", "1, 1"),
                     RegistrationId = table.Column<int>(type: "int", nullable: true),
                     Name = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
-                    CurrentTrackId = table.Column<int>(type: "int", nullable: true),
                     LocationId = table.Column<int>(type: "int", nullable: true),
                     LinksId = table.Column<int>(type: "int", nullable: true),
                     RecentlyTracksUpdateDate = table.Column<DateTime>(type: "datetime2", nullable: false),
@@ -109,12 +109,14 @@ namespace SynclyServer.Migrations
                 name: "JoinTrackArtist",
                 columns: table => new
                 {
+                    Id = table.Column<int>(type: "int", nullable: false)
+                        .Annotation("SqlServer:Identity", "1, 1"),
                     TrackId = table.Column<int>(type: "int", nullable: false),
                     ArtistId = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
-                    table.PrimaryKey("PK_JoinTrackArtist", x => new { x.TrackId, x.ArtistId });
+                    table.PrimaryKey("PK_JoinTrackArtist", x => x.Id);
                     table.ForeignKey(
                         name: "FK_JoinTrackArtist_Artists_ArtistId",
                         column: x => x.ArtistId,
@@ -264,6 +266,12 @@ namespace SynclyServer.Migrations
                 name: "IX_JoinTrackArtist_ArtistId",
                 table: "JoinTrackArtist",
                 column: "ArtistId");
+
+            migrationBuilder.CreateIndex(
+                name: "IX_JoinTrackArtist_TrackId_ArtistId",
+                table: "JoinTrackArtist",
+                columns: new[] { "TrackId", "ArtistId" },
+                unique: true);
 
             migrationBuilder.CreateIndex(
                 name: "IX_Locations_UserId",

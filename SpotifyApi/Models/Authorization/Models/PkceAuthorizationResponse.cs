@@ -35,7 +35,7 @@ public class PkceAccessToken
     [JsonPropertyName("refresh_token")] public string? RefreshToken { get; set; } = null;
 
     public PkceAccessTokenResult Result { get; set; } = PkceAccessTokenResult.Success;
-    [JsonInclude] public DateTime CreationDate { get; } = DateTime.Now;
+    [JsonInclude] public DateTime CreationDate { get; } = DateTime.UtcNow;
 
     [JsonConstructor]
     public PkceAccessToken(

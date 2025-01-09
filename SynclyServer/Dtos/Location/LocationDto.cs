@@ -13,5 +13,5 @@ public class LocationDto
     [Required]
     [Range(-181, 181)]
     public decimal Longitude { get; set; }
-    public DateTime LastUpdate { get; set; } = DateTime.Now;
+    public DateTime LastUpdate { get; set; } = DateTime.UtcNow;
 }

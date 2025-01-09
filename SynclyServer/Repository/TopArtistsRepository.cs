@@ -28,7 +28,7 @@ public class TopArtistsRepository(
             .FirstOrDefaultAsync(u => u.Id == userId);
         if (user is null)
             return null;
-        if (((DateTime.Now - user.TopArtistsUpdateDate).TotalDays > 1))
+        if ((DateTime.UtcNow - user.TopArtistsUpdateDate).TotalDays > 1)
         {
             user = await UpdateUserTopArtists(user);
             if (user is null)
@@ -60,11 +60,12 @@ public class TopArtistsRepository(
     private async Task<User?> UpdateUserTopArtists(User userModel)
     {
         var registrationData = await RegistrationRepository.GetRegistrationDataByUserIdAsync(userModel.Id);
-
+        if (registrationData is null)
+            return null;
         var topArtists =
             await SpotifyApi.SpotifyApi.GetUserTopItemsAsync<SpotifyApi.Models.Artist>(registrationData!.AccessToken,
                 MaxTopArtists);
-        if (topArtists.Result is not ApiResult.Success)
+        if (topArtists.Result is not ApiResult.Ok)
             return null;
         var topList = topArtists.Data!;
 

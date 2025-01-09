@@ -23,6 +23,7 @@ builder.Services.AddScoped<ILocationRepository, LocationRepository>();
 builder.Services.AddScoped<IRegistrationRepository, RegistrationRepository>();
 builder.Services.AddScoped<ITopTracksRepository, TopTrackRepository>();
 builder.Services.AddScoped<ITopArtistsRepository, TopArtistsRepository>();
+builder.Services.AddScoped<ITrackArtistRepository, TrackArtisRepository>();
 
 
 // TODO: Возможно, стоит сделать разделение базы данных, если мы будем реализовывать автоматическое подтягивание кода
